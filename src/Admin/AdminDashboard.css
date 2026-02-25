@@ -48,6 +48,7 @@
   width: 40px;
   height: 40px;
   background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-radius: 8px;
   display: flex;
@@ -94,6 +95,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 500;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
