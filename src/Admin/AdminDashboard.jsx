@@ -6,10 +6,16 @@ function AdminDashboard({ onLogout }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('systemLogs');
   const [profileData, setProfileData] = useState({
-    name: 'Citizen User',
-    aadhaar: '123456789012',
+    adminId: 'ADM-2024-001',
+    name: 'Rajesh Kumar Singh',
+    department: 'Election Commission',
+    designation: 'Senior Election Administrator',
+    email: 'admin@election.gov',
     phone: '9876543210',
     newPhone: '',
+    lastLogin: '2026-02-24 14:30:22',
+    accessLevel: 'Full Access',
+    assignedDistricts: ['Mumbai', 'Pune', 'Nagpur'],
     newPassword: '',
     confirmPassword: ''
   });
@@ -99,6 +105,46 @@ function AdminDashboard({ onLogout }) {
             <p className="header-subtitle">Ensuring transparency and integrity</p>
           </div>
         </div>
+        
+        {/* Header Navigation */}
+        <nav className="header-navigation">
+          <button 
+            className={`nav-item ${activeTab === 'userManagement' ? 'active' : ''}`}
+            onClick={() => setActiveTab('userManagement')}
+            title="Manage system users and their permissions"
+          >
+            👥 User Management
+          </button>
+          <button 
+            className={`nav-item ${activeTab === 'security' ? 'active' : ''}`}
+            onClick={() => setActiveTab('security')}
+            title="Configure security policies"
+          >
+            🔒 Security
+          </button>
+          <button 
+            className={`nav-item ${activeTab === 'elections' ? 'active' : ''}`}
+            onClick={() => setActiveTab('elections')}
+            title="Manage election data"
+          >
+            🗳️ Elections
+          </button>
+          <button 
+            className={`nav-item ${activeTab === 'systemLogs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('systemLogs')}
+            title="View system activity logs"
+          >
+            📋 System Logs
+          </button>
+          <button 
+            className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
+            onClick={() => setActiveTab('profile')}
+            title="Manage your profile"
+          >
+            👤 Profile
+          </button>
+        </nav>
+        
         <div className="header-right">
           <span className="role-badge">Admin</span>
           <button className="switch-role-btn" onClick={handleSwitchRole}>
@@ -258,27 +304,57 @@ function AdminDashboard({ onLogout }) {
             {activeTab === 'profile' && (
               <div className="profile-section">
                 <div className="section-header">
-                  <div className="section-icon">PR</div>
+                  <div className="section-icon">👤</div>
                   <div>
-                    <h3 className="section-title">Profile</h3>
-                    <p className="section-subtitle">Manage your account details</p>
+                    <h3 className="section-title">Admin Profile</h3>
+                    <p className="section-subtitle">Manage your admin account and settings</p>
                   </div>
                 </div>
 
                 <div className="profile-grid">
                   <div className="profile-card">
-                    <h4 className="profile-card-title">View Basic Details</h4>
+                    <h4 className="profile-card-title">Account Information</h4>
                     <div className="profile-row">
-                      <span className="profile-label">System Title</span>
-                      <span className="profile-value">Election Monitoring System</span>
+                      <span className="profile-label">Admin ID</span>
+                      <span className="profile-value">{profileData.adminId}</span>
                     </div>
                     <div className="profile-row">
-                      <span className="profile-label">Citizen Name</span>
+                      <span className="profile-label">Full Name</span>
                       <span className="profile-value">{profileData.name}</span>
                     </div>
                     <div className="profile-row">
-                      <span className="profile-label">Aadhaar</span>
-                      <span className="profile-value">{maskAadhaar(profileData.aadhaar)}</span>
+                      <span className="profile-label">Email</span>
+                      <span className="profile-value">{profileData.email}</span>
+                    </div>
+                    <div className="profile-row">
+                      <span className="profile-label">Department</span>
+                      <span className="profile-value">{profileData.department}</span>
+                    </div>
+                    <div className="profile-row">
+                      <span className="profile-label">Designation</span>
+                      <span className="profile-value">{profileData.designation}</span>
+                    </div>
+                  </div>
+
+                  <div className="profile-card">
+                    <h4 className="profile-card-title">Access & Permissions</h4>
+                    <div className="profile-row">
+                      <span className="profile-label">Access Level</span>
+                      <span className="profile-value"><span className="access-badge">{profileData.accessLevel}</span></span>
+                    </div>
+                    <div className="profile-row">
+                      <span className="profile-label">Assigned Districts</span>
+                      <span className="profile-value">
+                        <div className="districts-list">
+                          {profileData.assignedDistricts.map((district, idx) => (
+                            <span key={idx} className="district-badge">{district}</span>
+                          ))}
+                        </div>
+                      </span>
+                    </div>
+                    <div className="profile-row">
+                      <span className="profile-label">Last Login</span>
+                      <span className="profile-value">{profileData.lastLogin}</span>
                     </div>
                   </div>
 

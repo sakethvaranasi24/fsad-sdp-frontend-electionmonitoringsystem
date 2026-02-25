@@ -86,24 +86,24 @@ function CitizenPortal({ onLogout }) {
         jharkhand: 'Jharkhand'
       },
       districts: {
-        maharashtra: ['mumbai', 'pune', 'nagpur', 'nashik', 'thane', 'aurangabad', 'solapur'],
-        karnataka: ['bangalore', 'belgaum', 'mysore', 'kumta', 'hassan', 'mangalore', 'hubli'],
-        delhi: ['north', 'central', 'south', 'east', 'west', 'new-delhi', 'north-west'],
-        'tamil-nadu': ['chennai', 'madurai', 'salem', 'coimbatore', 'tiruppur', 'tiruchirappalli', 'erode'],
-        'uttar-pradesh': ['lucknow', 'kanpur', 'varanasi', 'agra', 'meerut', 'allahabad', 'ghaziabad'],
-        rajasthan: ['jaipur', 'udaipur', 'jodhpur', 'bikaner', 'ajmer', 'kota', 'alwar'],
-        gujarat: ['ahmedabad', 'surat', 'vadodara', 'rajkot', 'bhavnagar', 'jamnagar', 'gandhinagar'],
-        'west-bengal': ['kolkata', 'howrah', 'darjeeling', 'murshidabad', 'nadia', 'north-24-parganas', 'south-24-parganas'],
-        'madhya-pradesh': ['bhopal', 'indore', 'gwalior', 'jabalpur', 'ujjain', 'sagar', 'rewa'],
-        punjab: ['ludhiana', 'amritsar', 'jalandhar', 'patiala', 'bathinda', 'mohali', 'hoshiarpur'],
-        haryana: ['gurgaon', 'faridabad', 'rohtak', 'panipat', 'ambala', 'hisar', 'karnal'],
-        kerala: ['thiruvananthapuram', 'kochi', 'kozhikode', 'kollam', 'thrissur', 'palakkad', 'kannur'],
-        'andhra-pradesh': ['visakhapatnam', 'vijayawada', 'guntur', 'nellore', 'kurnool', 'tirupati', 'rajahmundry', 'anantapur', 'chittoor', 'kadapa', 'prakasam', 'srikakulam', 'east-godavari', 'west-godavari', 'krishna'],
-        telangana: ['hyderabad', 'warangal', 'nizamabad', 'karimnagar', 'khammam', 'nalgonda', 'rangareddy', 'adilabad', 'mahabubnagar', 'medak', 'sangareddy', 'mancherial', 'kamareddy', 'siddipet', 'vikarabad'],
-        bihar: ['patna', 'gaya', 'bhagalpur', 'muzaffarpur', 'darbhanga', 'purnia', 'araria'],
-        odisha: ['bhubaneswar', 'cuttack', 'puri', 'rourkela', 'sambalpur', 'berhampur', 'balasore'],
-        assam: ['guwahati', 'dibrugarh', 'jorhat', 'silchar', 'nagaon', 'tezpur', 'tinsukia'],
-        jharkhand: ['ranchi', 'jamshedpur', 'dhanbad', 'bokaro', 'hazaribagh', 'giridih', 'deoghar']
+        maharashtra: ['mumbai', 'pune', 'nagpur', 'nashik', 'thane', 'aurangabad', 'solapur', 'satara', 'kolhapur', 'ratnagiri', 'sindhudurg', 'sangli', 'latur', 'usmanabad', 'buldhana', 'akola'],
+        karnataka: ['bangalore', 'belgaum', 'mysore', 'kumta', 'hassan', 'mangalore', 'hubli', 'bijapur', 'dharwad', 'shimoga', 'davangere', 'kolar', 'tumkur', 'chickmagalur'],
+        delhi: ['north', 'central', 'south', 'east', 'west', 'new-delhi', 'north-west', 'north-east', 'south-east', 'west-delhi'],
+        'tamil-nadu': ['chennai', 'madurai', 'salem', 'coimbatore', 'tiruppur', 'tiruchirappalli', 'erode', 'vellore', 'ranipet', 'kanchipuram', 'villupuram', 'cuddalore', 'nagercoil', 'tirunelveli', 'kanniyakumari'],
+        'uttar-pradesh': ['lucknow', 'kanpur', 'varanasi', 'agra', 'meerut', 'allahabad', 'ghaziabad', 'bareilly', 'mathura', 'firozabad', 'azamgarh', 'gorakhpur', 'saharanpur', 'bijnor', 'moradabad'],
+        rajasthan: ['jaipur', 'udaipur', 'jodhpur', 'bikaner', 'ajmer', 'kota', 'alwar', 'kintoor', 'jhunjhunu', 'sikar', 'churu', 'hanumangarh', 'sriganganagar', 'barmer', 'jaisalmer'],
+        gujarat: ['ahmedabad', 'surat', 'vadodara', 'rajkot', 'bhavnagar', 'jamnagar', 'gandhinagar', 'yavatmal', 'junagadh', 'patan', 'amreli', 'valsad', 'navsari', 'porbandar', 'kutch'],
+        'west-bengal': ['kolkata', 'howrah', 'darjeeling', 'murshidabad', 'nadia', 'north-24-parganas', 'south-24-parganas', 'jalpaiguri', 'cooch-behar', 'siliguri', 'malda', 'western-dinajpur', 'eastern-dinajpur', 'bankura', 'birbhum'],
+        'madhya-pradesh': ['bhopal', 'indore', 'gwalior', 'jabalpur', 'ujjain', 'sagar', 'rewa', 'dindori', 'seoni', 'sidhi', 'tikamgarh', 'datia', 'raisen', 'vidisha', 'hoshangabad'],
+        punjab: ['ludhiana', 'amritsar', 'jalandhar', 'patiala', 'bathinda', 'mohali', 'hoshiarpur', 'gurdaspur', 'tarn-taran', 'kapurthala', 'mansa', 'sangrur', 'ferozepur', 'firozpur'],
+        haryana: ['gurgaon', 'faridabad', 'rohtak', 'panipat', 'ambala', 'hisar', 'karnal', 'yamunanagar', 'panchkula', 'sonipat', 'ellenabad', 'mahendragarh', 'nuh', 'palwal'],
+        kerala: ['thiruvananthapuram', 'kochi', 'kozhikode', 'kollam', 'thrissur', 'palakkad', 'kannur', 'idukki', 'alappuzha', 'pathanamthitta', 'malappuram', 'ernakulam', 'kottayam', 'wayanad'],
+        'andhra-pradesh': ['visakhapatnam', 'vijayawada', 'guntur', 'nellore', 'kurnool', 'tirupati', 'rajahmundry', 'anantapur', 'chittoor', 'kadapa', 'prakasam', 'srikakulam', 'east-godavari', 'west-godavari', 'krishna', 'spsr-nellore'],
+        telangana: ['hyderabad', 'warangal', 'nizamabad', 'karimnagar', 'khammam', 'nalgonda', 'rangareddy', 'adilabad', 'mahabubnagar', 'medak', 'sangareddy', 'mancherial', 'kamareddy', 'siddipet', 'vikarabad', 'secunderabad', 'tandur'],
+        bihar: ['patna', 'gaya', 'bhagalpur', 'muzaffarpur', 'darbhanga', 'purnia', 'araria', 'east-champaran', 'west-champaran', 'sitamarhi', 'madhubani', 'saharsa', 'khagaria', 'buxar', 'vaishali'],
+        odisha: ['bhubaneswar', 'cuttack', 'puri', 'rourkela', 'sambalpur', 'berhampur', 'balasore', 'bhadrak', 'dhenkanal', 'angul', 'jajpur', 'kendrapara', 'malkangiri', 'koraput', 'bargarh'],
+        assam: ['guwahati', 'dibrugarh', 'jorhat', 'silchar', 'nagaon', 'tezpur', 'tinsukia', 'kamrup', 'barpeta', 'dhubri', 'goalpara', 'lakhimpur', 'sonitpur', 'cachar', 'dima-hasao'],
+        jharkhand: ['ranchi', 'jamshedpur', 'dhanbad', 'bokaro', 'hazaribagh', 'giridih', 'deoghar', 'singhbhum', 'dumka', 'godda', 'sahibganj', 'pakur', 'kolhan', 'ramgarh']
       },
       districtNames: {
         // Maharashtra
@@ -260,7 +260,147 @@ function CitizenPortal({ onLogout }) {
         bokaro: 'Bokaro',
         hazaribagh: 'Hazaribagh',
         giridih: 'Giridih',
-        deoghar: 'Deoghar'
+        deoghar: 'Deoghar',
+        // Maharashtra - New Districts
+        satara: 'Satara',
+        kolhapur: 'Kolhapur',
+        ratnagiri: 'Ratnagiri',
+        sindhudurg: 'Sindhudurg',
+        sangli: 'Sangli',
+        latur: 'Latur',
+        usmanabad: 'Usmanabad',
+        buldhana: 'Buldhana',
+        akola: 'Akola',
+        // Karnataka - New Districts
+        bijapur: 'Bijapur',
+        dharwad: 'Dharwad',
+        shimoga: 'Shimoga',
+        davangere: 'Davangere',
+        kolar: 'Kolar',
+        tumkur: 'Tumkur',
+        chickmagalur: 'Chickmagalur',
+        // Delhi - New Districts
+        'north-east': 'North East Delhi',
+        'south-east': 'South East Delhi',
+        'west-delhi': 'West Delhi',
+        // Tamil Nadu - New Districts
+        vellore: 'Vellore',
+        ranipet: 'Ranipet',
+        kanchipuram: 'Kanchipuram',
+        villupuram: 'Villupuram',
+        cuddalore: 'Cuddalore',
+        nagercoil: 'Nagercoil',
+        tirunelveli: 'Tirunelveli',
+        kanniyakumari: 'Kanniyakumari',
+        // Uttar Pradesh - New Districts
+        bareilly: 'Bareilly',
+        mathura: 'Mathura',
+        firozabad: 'Firozabad',
+        azamgarh: 'Azamgarh',
+        gorakhpur: 'Gorakhpur',
+        saharanpur: 'Saharanpur',
+        bijnor: 'Bijnor',
+        moradabad: 'Moradabad',
+        // Rajasthan - New Districts
+        kintoor: 'Kintoor',
+        jhunjhunu: 'Jhunjhunu',
+        sikar: 'Sikar',
+        churu: 'Churu',
+        hanumangarh: 'Hanumangarh',
+        sriganganagar: 'Sriganganagar',
+        barmer: 'Barmer',
+        jaisalmer: 'Jaisalmer',
+        // Gujarat - New Districts
+        yavatmal: 'Yavatmal',
+        junagadh: 'Junagadh',
+        patan: 'Patan',
+        amreli: 'Amreli',
+        valsad: 'Valsad',
+        navsari: 'Navsari',
+        porbandar: 'Porbandar',
+        kutch: 'Kutch',
+        // West Bengal - New Districts
+        jalpaiguri: 'Jalpaiguri',
+        'cooch-behar': 'Cooch Behar',
+        siliguri: 'Siliguri',
+        malda: 'Malda',
+        'western-dinajpur': 'Western Dinajpur',
+        'eastern-dinajpur': 'Eastern Dinajpur',
+        bankura: 'Bankura',
+        birbhum: 'Birbhum',
+        // Madhya Pradesh - New Districts
+        dindori: 'Dindori',
+        seoni: 'Seoni',
+        sidhi: 'Sidhi',
+        tikamgarh: 'Tikamgarh',
+        datia: 'Datia',
+        raisen: 'Raisen',
+        vidisha: 'Vidisha',
+        hoshangabad: 'Hoshangabad',
+        // Punjab - New Districts
+        gurdaspur: 'Gurdaspur',
+        'tarn-taran': 'Tarn Taran',
+        kapurthala: 'Kapurthala',
+        mansa: 'Mansa',
+        sangrur: 'Sangrur',
+        ferozepur: 'Ferozepur',
+        firozpur: 'Firozpur',
+        // Haryana - New Districts
+        yamunanagar: 'Yamunanagar',
+        panchkula: 'Panchkula',
+        sonipat: 'Sonipat',
+        ellenabad: 'Ellenabad',
+        mahendragarh: 'Mahendragarh',
+        nuh: 'Nuh',
+        palwal: 'Palwal',
+        // Kerala - New Districts
+        idukki: 'Idukki',
+        alappuzha: 'Alappuzha',
+        pathanamthitta: 'Pathanamthitta',
+        malappuram: 'Malappuram',
+        ernakulam: 'Ernakulam',
+        kottayam: 'Kottayam',
+        wayanad: 'Wayanad',
+        // Andhra Pradesh - New Districts
+        'spsr-nellore': 'Sri Potti Sriramulu Nellore',
+        // Telangana - New Districts
+        secunderabad: 'Secunderabad',
+        tandur: 'Tandur',
+        // Bihar - New Districts
+        'east-champaran': 'East Champaran',
+        'west-champaran': 'West Champaran',
+        sitamarhi: 'Sitamarhi',
+        madhubani: 'Madhubani',
+        saharsa: 'Saharsa',
+        khagaria: 'Khagaria',
+        buxar: 'Buxar',
+        vaishali: 'Vaishali',
+        // Odisha - New Districts
+        bhadrak: 'Bhadrak',
+        dhenkanal: 'Dhenkanal',
+        angul: 'Angul',
+        jajpur: 'Jajpur',
+        kendrapara: 'Kendrapara',
+        malkangiri: 'Malkangiri',
+        koraput: 'Koraput',
+        bargarh: 'Bargarh',
+        // Assam - New Districts
+        kamrup: 'Kamrup',
+        barpeta: 'Barpeta',
+        dhubri: 'Dhubri',
+        goalpara: 'Goalpara',
+        lakhimpur: 'Lakhimpur',
+        sonitpur: 'Sonitpur',
+        cachar: 'Cachar',
+        'dima-hasao': 'Dima Hasao',
+        // Jharkhand - New Districts
+        singhbhum: 'Singhbhum',
+        dumka: 'Dumka',
+        godda: 'Godda',
+        sahibganj: 'Sahibganj',
+        pakur: 'Pakur',
+        kolhan: 'Kolhan',
+        ramgarh: 'Ramgarh'
       }
     }
   };
@@ -388,6 +528,162 @@ function CitizenPortal({ onLogout }) {
       'Guwahati': [
         { id: 47, name: 'Narengi Village Booth', address: 'Narengi, Guwahati', status: 'operational', queue: 11, distance: '4.6 km', mapUrl: 'https://maps.google.com/?q=Guwahati+Assam' },
         { id: 48, name: 'Kamakhya Village Center', address: 'Kamakhya Hills, Guwahati', status: 'operational', queue: 16, distance: '7.3 km', mapUrl: 'https://maps.google.com/?q=Kamakhya+Guwahati' }
+      ],
+      'Dibrugarh': [
+        { id: 49, name: 'Oil Town Polling Station', address: 'Dibrugarh Town, Assam', status: 'operational', queue: 13, distance: '3.1 km', mapUrl: 'https://maps.google.com/?q=Dibrugarh+Assam' },
+        { id: 50, name: 'Brahmaputra Valley Community Hall', address: 'Valley Road, Dibrugarh', status: 'operational', queue: 8, distance: '5.9 km', mapUrl: 'https://maps.google.com/?q=Dibrugarh+Valley' }
+      ]
+    },
+    'Punjab': {
+      'Ludhiana': [
+        { id: 51, name: 'Model Town Community Center', address: 'Model Town, Ludhiana', status: 'operational', queue: 15, distance: '2.8 km', mapUrl: 'https://maps.google.com/?q=Ludhiana+Punjab' },
+        { id: 52, name: 'Sarabha Nagar Polling Station', address: 'Sarabha Nagar, Ludhiana', status: 'operational', queue: 10, distance: '4.6 km', mapUrl: 'https://maps.google.com/?q=Sarabha+Nagar+Ludhiana' }
+      ],
+      'Amritsar': [
+        { id: 53, name: 'Golden Temple Community Hall', address: 'Temple Road, Amritsar', status: 'operational', queue: 19, distance: '3.2 km', mapUrl: 'https://maps.google.com/?q=Amritsar+Punjab' },
+        { id: 54, name: 'Cantonment Polling Booth', address: 'Cantonment, Amritsar', status: 'operational', queue: 12, distance: '5.1 km', mapUrl: 'https://maps.google.com/?q=Cantonment+Amritsar' }
+      ]
+    },
+    'Haryana': {
+      'Gurgaon': [
+        { id: 55, name: 'DLF Cyber Hub Community Center', address: 'DLF Cyber Hub, Gurgaon', status: 'operational', queue: 22, distance: '3.5 km', mapUrl: 'https://maps.google.com/?q=DLF+Cyber+Hub+Gurgaon' },
+        { id: 56, name: 'Sector 57 Polling Station', address: 'Sector 57, Gurgaon', status: 'operational', queue: 14, distance: '4.9 km', mapUrl: 'https://maps.google.com/?q=Sector+57+Gurgaon' }
+      ],
+      'Faridabad': [
+        { id: 57, name: 'Industrial Town Community Hall', address: 'Faridabad Industrial Area', status: 'operational', queue: 18, distance: '2.9 km', mapUrl: 'https://maps.google.com/?q=Faridabad+Haryana' },
+        { id: 58, name: 'NIT Faridabad Polling Center', address: 'NIT Campus, Faridabad', status: 'operational', queue: 11, distance: '5.6 km', mapUrl: 'https://maps.google.com/?q=NIT+Faridabad' }
+      ]
+    },
+    'Kerala': {
+      'Kochi': [
+        { id: 59, name: 'Kochi Port Community Hall', address: 'Port Area, Kochi', status: 'operational', queue: 16, distance: '3.4 km', mapUrl: 'https://maps.google.com/?q=Kochi+Kerala' },
+        { id: 60, name: 'Mattancherry Village Booth', address: 'Mattancherry, Kochi', status: 'operational', queue: 9, distance: '4.2 km', mapUrl: 'https://maps.google.com/?q=Mattancherry+Kochi' }
+      ],
+      'Thiruvananthapuram': [
+        { id: 61, name: 'Museum Area Polling Station', address: 'Museum Road, Thiruvananthapuram', status: 'operational', queue: 14, distance: '2.7 km', mapUrl: 'https://maps.google.com/?q=Thiruvananthapuram+Kerala' },
+        { id: 62, name: 'Pattom Community Center', address: 'Pattom, Thiruvananthapuram', status: 'operational', queue: 10, distance: '3.5 km', mapUrl: 'https://maps.google.com/?q=Pattom+Thiruvananthapuram' }
+      ]
+    },
+    'Telangana': {
+      'Hyderabad': [
+        { id: 13, name: 'Cyberabad IT Park Hall', address: 'HITEC City, Madhapur, Hyderabad', status: 'operational', queue: 22, distance: '4.0 km', mapUrl: 'https://maps.google.com/?q=HITEC+City+Hyderabad' },
+        { id: 14, name: 'Banjara Hills Community Center', address: 'Banjara Hills, Hyderabad', status: 'operational', queue: 13, distance: '6.5 km', mapUrl: 'https://maps.google.com/?q=Banjara+Hills+Hyderabad' }
+      ],
+      'Warangal': [
+        { id: 63, name: 'Ancient Fort Area Polling Center', address: 'Fort Area, Warangal', status: 'operational', queue: 17, distance: '3.6 km', mapUrl: 'https://maps.google.com/?q=Warangal+Telangana' },
+        { id: 64, name: 'Hanmakonda Community Hall', address: 'Hanmakonda, Warangal', status: 'operational', queue: 12, distance: '5.4 km', mapUrl: 'https://maps.google.com/?q=Hanmakonda+Warangal' }
+      ]
+    },
+    'Karnataka': {
+      'Bangalore': [
+        { id: 5, name: 'MG Road Municipal School', address: 'MG Road, Brigade Road Junction, Bangalore', status: 'delayed', queue: 35, distance: '4.5 km', mapUrl: 'https://maps.google.com/?q=MG+Road+Bangalore' },
+        { id: 6, name: 'Indiranagar Community Hall', address: 'Indiranagar, Bangalore', status: 'operational', queue: 19, distance: '6.2 km', mapUrl: 'https://maps.google.com/?q=Indiranagar+Bangalore' }
+      ],
+      'Mysore': [
+        { id: 65, name: 'Palace Road Polling Station', address: 'Palace Road, Mysore', status: 'operational', queue: 13, distance: '2.9 km', mapUrl: 'https://maps.google.com/?q=Mysore+Karnataka' },
+        { id: 66, name: 'Gokulam Community Hall', address: 'Gokulam, Mysore', status: 'operational', queue: 8, distance: '4.7 km', mapUrl: 'https://maps.google.com/?q=Gokulam+Mysore' }
+      ]
+    },
+    'Uttar Pradesh': {
+      'Lucknow': [
+        { id: 15, name: 'Hazratganj Public Library', address: 'Park Road, Hazratganj, Lucknow', status: 'delayed', queue: 28, distance: '3.5 km', mapUrl: 'https://maps.google.com/?q=Hazratganj+Lucknow' },
+        { id: 16, name: 'Gomti Nagar Community Hall', address: 'Gomti Nagar, Lucknow', status: 'operational', queue: 8, distance: '5.4 km', mapUrl: 'https://maps.google.com/?q=Gomti+Nagar+Lucknow' }
+      ],
+      'Agra': [
+        { id: 21, name: 'Taj Nagar Community Hall', address: 'Taj Nagar, Agra', status: 'operational', queue: 19, distance: '2.1 km', mapUrl: 'https://maps.google.com/?q=Agra+Uttar+Pradesh' },
+        { id: 22, name: 'Fatehabad Village Booth', address: 'Fatehabad, Agra', status: 'operational', queue: 13, distance: '8.3 km', mapUrl: 'https://maps.google.com/?q=Fatehabad+Agra' }
+      ],
+      'Varanasi': [
+        { id: 23, name: 'Kaashi Village Polling Center', address: 'Mir Ghat, Varanasi', status: 'operational', queue: 22, distance: '1.5 km', mapUrl: 'https://maps.google.com/?q=Varanasi+Uttar+Pradesh' },
+        { id: 24, name: 'Ramnagar Community School', address: 'Ramnagar, Varanasi', status: 'operational', queue: 11, distance: '9.2 km', mapUrl: 'https://maps.google.com/?q=Ramnagar+Varanasi' }
+      ],
+      'Kanpur': [
+        { id: 67, name: 'Jajmau Industrial Area Booth', address: 'Jajmau, Kanpur', status: 'operational', queue: 16, distance: '3.8 km', mapUrl: 'https://maps.google.com/?q=Kanpur+Uttar+Pradesh' },
+        { id: 68, name: 'Ider Shaktinagar Community Hall', address: 'Shaktinagar, Kanpur', status: 'operational', queue: 14, distance: '5.2 km', mapUrl: 'https://maps.google.com/?q=Shaktinagar+Kanpur' }
+      ]
+    },
+    'Rajasthan': {
+      'Jaipur': [
+        { id: 17, name: 'City Palace Community Center', address: 'Janpath Road, Jaipur', status: 'operational', queue: 24, distance: '3.0 km', mapUrl: 'https://maps.google.com/?q=Jaipur+Rajasthan' },
+        { id: 18, name: 'Malviya Village Polling Booth', address: 'Malviya Nagar, Jaipur', status: 'operational', queue: 15, distance: '6.8 km', mapUrl: 'https://maps.google.com/?q=Malviya+Nagar+Jaipur' }
+      ],
+      'Udaipur': [
+        { id: 19, name: 'City Palace Village Center', address: 'Haldi Ghati Road, Udaipur', status: 'operational', queue: 10, distance: '4.2 km', mapUrl: 'https://maps.google.com/?q=Udaipur+Rajasthan' },
+        { id: 20, name: 'Fateh Sagar Village School', address: 'Fateh Sagar, Udaipur', status: 'operational', queue: 8, distance: '7.5 km', mapUrl: 'https://maps.google.com/?q=Fateh+Sagar+Udaipur' }
+      ],
+      'Jodhpur': [
+        { id: 69, name: 'Mehrangarh Fort Area Polling Station', address: 'Fort Road, Jodhpur', status: 'operational', queue: 20, distance: '4.1 km', mapUrl: 'https://maps.google.com/?q=Jodhpur+Rajasthan' },
+        { id: 70, name: 'Makrana Village Booth', address: 'Makrana, Jodhpur', status: 'operational', queue: 11, distance: '6.9 km', mapUrl: 'https://maps.google.com/?q=Makrana+Jodhpur' }
+      ]
+    },
+    'Gujarat': {
+      'Ahmedabad': [
+        { id: 25, name: 'Sardar Patel Village Hall', address: 'Navrangpura, Ahmedabad', status: 'operational', queue: 20, distance: '3.8 km', mapUrl: 'https://maps.google.com/?q=Ahmedabad+Gujarat' },
+        { id: 26, name: 'Thaltej Village Booth', address: 'Thaltej, Ahmedabad', status: 'operational', queue: 14, distance: '7.1 km', mapUrl: 'https://maps.google.com/?q=Thaltej+Ahmedabad' }
+      ],
+      'Surat': [
+        { id: 27, name: 'Diamond City Polling Station', address: 'Piplod, Surat', status: 'operational', queue: 26, distance: '4.5 km', mapUrl: 'https://maps.google.com/?q=Surat+Gujarat' },
+        { id: 28, name: 'Katargam Village Booth', address: 'Katargam, Surat', status: 'operational', queue: 9, distance: '6.7 km', mapUrl: 'https://maps.google.com/?q=Katargam+Surat' }
+      ],
+      'Vadodara': [
+        { id: 29, name: 'Sayaji Garden Community Center', address: 'Opp Sayaji Garden, Vadodara', status: 'operational', queue: 16, distance: '2.9 km', mapUrl: 'https://maps.google.com/?q=Vadodara+Gujarat' },
+        { id: 30, name: 'Kareli Village Polling Booth', address: 'Kareli, Vadodara', status: 'operational', queue: 12, distance: '5.2 km', mapUrl: 'https://maps.google.com/?q=Kareli+Vadodara' }
+      ],
+      'Rajkot': [
+        { id: 71, name: 'Rajkot Race Course Community Hall', address: 'Race Course, Rajkot', status: 'operational', queue: 17, distance: '3.3 km', mapUrl: 'https://maps.google.com/?q=Rajkot+Gujarat' },
+        { id: 72, name: 'Kuvadva Village Booth', address: 'Kuvadva, Rajkot', status: 'operational', queue: 10, distance: '6.2 km', mapUrl: 'https://maps.google.com/?q=Kuvadva+Rajkot' }
+      ]
+    },
+    'Madhya Pradesh': {
+      'Bhopal': [
+        { id: 31, name: 'Van Vihar Village School', address: 'Van Vihar Road, Bhopal', status: 'operational', queue: 17, distance: '3.4 km', mapUrl: 'https://maps.google.com/?q=Bhopal+Madhya+Pradesh' },
+        { id: 32, name: 'Raisen Village Polling Center', address: 'Raisen, Bhopal', status: 'operational', queue: 10, distance: '7.8 km', mapUrl: 'https://maps.google.com/?q=Raisen+Bhopal' }
+      ],
+      'Indore': [
+        { id: 33, name: 'Madhya Marg Polling Station', address: 'Madhya Marg, Indore', status: 'operational', queue: 21, distance: '3.1 km', mapUrl: 'https://maps.google.com/?q=Indore+Madhya+Pradesh' },
+        { id: 34, name: 'Mhow Village Booth', address: 'Mhow, Indore', status: 'operational', queue: 8, distance: '6.9 km', mapUrl: 'https://maps.google.com/?q=Mhow+Indore' }
+      ],
+      'Gwalior': [
+        { id: 73, name: 'Gwalior Fort Area Polling Station', address: 'Fort Road, Gwalior', status: 'operational', queue: 18, distance: '2.8 km', mapUrl: 'https://maps.google.com/?q=Gwalior+Madhya+Pradesh' },
+        { id: 74, name: 'Lashkar Community Hall', address: 'Lashkar, Gwalior', status: 'operational', queue: 13, distance: '4.5 km', mapUrl: 'https://maps.google.com/?q=Lashkar+Gwalior' }
+      ]
+    },
+    'Bihar': {
+      'Patna': [
+        { id: 35, name: 'Patliputra Village Hall', address: 'Patliputra, Patna', status: 'operational', queue: 19, distance: '4.3 km', mapUrl: 'https://maps.google.com/?q=Patna+Bihar' },
+        { id: 36, name: 'Nalanda Village School', address: 'Nalanda, Patna', status: 'operational', queue: 14, distance: '8.1 km', mapUrl: 'https://maps.google.com/?q=Nalanda+Patna' }
+      ],
+      'Gaya': [
+        { id: 37, name: 'Vishnupad Temple Area Booth', address: 'Temple Road, Gaya', status: 'operational', queue: 12, distance: '2.6 km', mapUrl: 'https://maps.google.com/?q=Gaya+Bihar' },
+        { id: 38, name: 'Wazirganj Village Center', address: 'Wazirganj, Gaya', status: 'operational', queue: 9, distance: '7.4 km', mapUrl: 'https://maps.google.com/?q=Wazirganj+Gaya' }
+      ],
+      'Bhagalpur': [
+        { id: 75, name: 'Bhagalpur Silk City Polling Station', address: 'Silk Factory Area, Bhagalpur', status: 'operational', queue: 15, distance: '3.2 km', mapUrl: 'https://maps.google.com/?q=Bhagalpur+Bihar' },
+        { id: 76, name: 'Sultanganj Community Hall', address: 'Sultanganj, Bhagalpur', status: 'operational', queue: 10, distance: '5.8 km', mapUrl: 'https://maps.google.com/?q=Sultanganj+Bhagalpur' }
+      ]
+    },
+    'Odisha': {
+      'Bhubaneswar': [
+        { id: 39, name: 'Nayapalli Village School', address: 'Nayapalli, Bhubaneswar', status: 'operational', queue: 15, distance: '3.7 km', mapUrl: 'https://maps.google.com/?q=Bhubaneswar+Odisha' },
+        { id: 40, name: 'Samanta Chandi Village Booth', address: 'Samanta Chandi, Bhubaneswar', status: 'operational', queue: 11, distance: '6.5 km', mapUrl: 'https://maps.google.com/?q=Samanta+Chandi+Bhubaneswar' }
+      ],
+      'Cuttack': [
+        { id: 41, name: 'Badambadi Village Center', address: 'Badambadi, Cuttack', status: 'operational', queue: 18, distance: '4.1 km', mapUrl: 'https://maps.google.com/?q=Cuttack+Odisha' },
+        { id: 42, name: 'Jagatpur Village School', address: 'Jagatpur, Cuttack', status: 'operational', queue: 7, distance: '8.2 km', mapUrl: 'https://maps.google.com/?q=Jagatpur+Cuttack' }
+      ],
+      'Puri': [
+        { id: 77, name: 'Jagannath Temple Area Community Hall', address: 'Temple Road, Puri', status: 'operational', queue: 20, distance: '3.4 km', mapUrl: 'https://maps.google.com/?q=Puri+Odisha' },
+        { id: 78, name: 'Satyabadi Village Booth', address: 'Satyabadi, Puri', status: 'operational', queue: 12, distance: '5.9 km', mapUrl: 'https://maps.google.com/?q=Satyabadi+Puri' }
+      ]
+    },
+    'Andhra Pradesh': {
+      'Visakhapatnam': [
+        { id: 43, name: 'Vizag Village Polling Station', address: 'Gajuwaka, Visakhapatnam', status: 'operational', queue: 20, distance: '5.0 km', mapUrl: 'https://maps.google.com/?q=Visakhapatnam+Andhra+Pradesh' },
+        { id: 44, name: 'Atchutapuram Village Booth', address: 'Atchutapuram, Visakhapatnam', status: 'operational', queue: 10, distance: '7.8 km', mapUrl: 'https://maps.google.com/?q=Atchutapuram+Visakhapatnam' }
+      ],
+      'Vijayawada': [
+        { id: 79, name: 'Krishna River Valley Polling Center', address: 'River Road, Vijayawada', status: 'operational', queue: 16, distance: '3.7 km', mapUrl: 'https://maps.google.com/?q=Vijayawada+Andhra+Pradesh' },
+        { id: 80, name: 'Kanuru Community Hall', address: 'Kanuru, Vijayawada', status: 'operational', queue: 13, distance: '4.9 km', mapUrl: 'https://maps.google.com/?q=Kanuru+Vijayawada' }
       ]
     }
   };
@@ -886,198 +1182,196 @@ function CitizenPortal({ onLogout }) {
 
                   <div>
                     <form className="register-form" onSubmit={handleRegisterSubmit} noValidate>
-                  <div className="form-section">
-                    <h4 className="form-section-title">Personal Information</h4>
-                    <div className="form-grid">
-                      <div className="form-field">
-                        <label htmlFor="regFullName">Full Name *</label>
-                        <input
-                          id="regFullName"
-                          type="text"
-                          value={registerForm.fullName}
-                          onChange={(e) => handleRegisterChange('fullName', e.target.value)}
-                        />
-                        {registerErrors.fullName && <span className="field-error">{registerErrors.fullName}</span>}
+                      <div className="form-section">
+                        <h4 className="form-section-title">Personal Information</h4>
+                        <div className="form-grid">
+                          <div className="form-field">
+                            <label htmlFor="regFullName">Full Name *</label>
+                            <input
+                              id="regFullName"
+                              type="text"
+                              value={registerForm.fullName}
+                              onChange={(e) => handleRegisterChange('fullName', e.target.value)}
+                            />
+                            {registerErrors.fullName && <span className="field-error">{registerErrors.fullName}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regParentName">Father/Mother Name *</label>
+                            <input
+                              id="regParentName"
+                              type="text"
+                              value={registerForm.parentName}
+                              onChange={(e) => handleRegisterChange('parentName', e.target.value)}
+                            />
+                            {registerErrors.parentName && <span className="field-error">{registerErrors.parentName}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regDob">Date of Birth *</label>
+                            <input
+                              id="regDob"
+                              type="date"
+                              value={registerForm.dob}
+                              onChange={(e) => handleRegisterChange('dob', e.target.value)}
+                            />
+                            {registerErrors.dob && <span className="field-error">{registerErrors.dob}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regGender">Gender *</label>
+                            <select
+                              id="regGender"
+                              value={registerForm.gender}
+                              onChange={(e) => handleRegisterChange('gender', e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              <option value="male">Male</option>
+                              <option value="female">Female</option>
+                              <option value="other">Other</option>
+                            </select>
+                            {registerErrors.gender && <span className="field-error">{registerErrors.gender}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regAadhaar">Aadhaar Number *</label>
+                            <input
+                              id="regAadhaar"
+                              type="text"
+                              inputMode="numeric"
+                              maxLength="12"
+                              value={registerForm.aadhaar}
+                              onChange={(e) => handleRegisterChange('aadhaar', e.target.value.replace(/\D/g, '').slice(0, 12))}
+                            />
+                            {registerErrors.aadhaar && <span className="field-error">{registerErrors.aadhaar}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regMobile">Mobile Number *</label>
+                            <input
+                              id="regMobile"
+                              type="text"
+                              inputMode="numeric"
+                              maxLength="10"
+                              value={registerForm.mobile}
+                              onChange={(e) => handleRegisterChange('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            />
+                            {registerErrors.mobile && <span className="field-error">{registerErrors.mobile}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regEmail">Email ID *</label>
+                            <input
+                              id="regEmail"
+                              type="email"
+                              value={registerForm.email}
+                              onChange={(e) => handleRegisterChange('email', e.target.value)}
+                            />
+                            {registerErrors.email && <span className="field-error">{registerErrors.email}</span>}
+                          </div>
+                        </div>
                       </div>
-                      <div className="form-field">
-                        <label htmlFor="regParentName">Father/Mother Name *</label>
-                        <input
-                          id="regParentName"
-                          type="text"
-                          value={registerForm.parentName}
-                          onChange={(e) => handleRegisterChange('parentName', e.target.value)}
-                        />
-                        {registerErrors.parentName && <span className="field-error">{registerErrors.parentName}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regDob">Date of Birth *</label>
-                        <input
-                          id="regDob"
-                          type="date"
-                          value={registerForm.dob}
-                          onChange={(e) => handleRegisterChange('dob', e.target.value)}
-                        />
-                        {registerErrors.dob && <span className="field-error">{registerErrors.dob}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regGender">Gender *</label>
-                        <select
-                          id="regGender"
-                          value={registerForm.gender}
-                          onChange={(e) => handleRegisterChange('gender', e.target.value)}
-                        >
-                          <option value="">-- Select --</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                          <option value="other">Other</option>
-                        </select>
-                        {registerErrors.gender && <span className="field-error">{registerErrors.gender}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regAadhaar">Aadhaar Number *</label>
-                        <input
-                          id="regAadhaar"
-                          type="text"
-                          inputMode="numeric"
-                          maxLength="12"
-                          value={registerForm.aadhaar}
-                          onChange={(e) => handleRegisterChange('aadhaar', e.target.value.replace(/\D/g, '').slice(0, 12))}
-                        />
-                        {registerErrors.aadhaar && <span className="field-error">{registerErrors.aadhaar}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regMobile">Mobile Number *</label>
-                        <input
-                          id="regMobile"
-                          type="text"
-                          inputMode="numeric"
-                          maxLength="10"
-                          value={registerForm.mobile}
-                          onChange={(e) => handleRegisterChange('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}
-                        />
-                        {registerErrors.mobile && <span className="field-error">{registerErrors.mobile}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regEmail">Email ID *</label>
-                        <input
-                          id="regEmail"
-                          type="email"
-                          value={registerForm.email}
-                          onChange={(e) => handleRegisterChange('email', e.target.value)}
-                        />
-                        {registerErrors.email && <span className="field-error">{registerErrors.email}</span>}
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="form-section">
-                    <h4 className="form-section-title">Address Details</h4>
-                    <div className="form-grid">
-                      <div className="form-field">
-                        <label htmlFor="regHouse">House Number *</label>
-                        <input
-                          id="regHouse"
-                          type="text"
-                          value={registerForm.houseNumber}
-                          onChange={(e) => handleRegisterChange('houseNumber', e.target.value)}
-                        />
-                        {registerErrors.houseNumber && <span className="field-error">{registerErrors.houseNumber}</span>}
+                      <div className="form-section">
+                        <h4 className="form-section-title">Address Details</h4>
+                        <div className="form-grid">
+                          <div className="form-field">
+                            <label htmlFor="regHouse">House Number *</label>
+                            <input
+                              id="regHouse"
+                              type="text"
+                              value={registerForm.houseNumber}
+                              onChange={(e) => handleRegisterChange('houseNumber', e.target.value)}
+                            />
+                            {registerErrors.houseNumber && <span className="field-error">{registerErrors.houseNumber}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regStreet">Street/Area *</label>
+                            <input
+                              id="regStreet"
+                              type="text"
+                              value={registerForm.street}
+                              onChange={(e) => handleRegisterChange('street', e.target.value)}
+                            />
+                            {registerErrors.street && <span className="field-error">{registerErrors.street}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regCity">City *</label>
+                            <input
+                              id="regCity"
+                              type="text"
+                              value={registerForm.city}
+                              onChange={(e) => handleRegisterChange('city', e.target.value)}
+                            />
+                            {registerErrors.city && <span className="field-error">{registerErrors.city}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regState">State *</label>
+                            <select
+                              id="regState"
+                              value={registerForm.state}
+                              onChange={(e) => {
+                                handleRegisterChange('state', e.target.value);
+                                handleRegisterChange('district', '');
+                              }}
+                            >
+                              <option value="">-- Select --</option>
+                              {getRegisterStates().map((stateCode) => (
+                                <option key={stateCode} value={stateCode}>{getStateLabel(stateCode)}</option>
+                              ))}
+                            </select>
+                            {registerErrors.state && <span className="field-error">{registerErrors.state}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regDistrict">District *</label>
+                            <select
+                              id="regDistrict"
+                              value={registerForm.district}
+                              onChange={(e) => handleRegisterChange('district', e.target.value)}
+                              disabled={!registerForm.state}
+                            >
+                              <option value="">-- Select --</option>
+                              {getRegisterDistricts(registerForm.state).map((districtCode) => (
+                                <option key={districtCode} value={districtCode}>{getDistrictLabel(districtCode)}</option>
+                              ))}
+                            </select>
+                            {registerErrors.district && <span className="field-error">{registerErrors.district}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regPin">PIN Code *</label>
+                            <input
+                              id="regPin"
+                              type="text"
+                              inputMode="numeric"
+                              maxLength="6"
+                              value={registerForm.pin}
+                              onChange={(e) => handleRegisterChange('pin', e.target.value.replace(/\D/g, '').slice(0, 6))}
+                            />
+                            {registerErrors.pin && <span className="field-error">{registerErrors.pin}</span>}
+                          </div>
+                          <div className="form-field">
+                            <label htmlFor="regConstituency">Constituency *</label>
+                            <select
+                              id="regConstituency"
+                              value={registerForm.constituency}
+                              onChange={(e) => handleRegisterChange('constituency', e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              <option value="urban-north">Urban North</option>
+                              <option value="urban-south">Urban South</option>
+                              <option value="rural-east">Rural East</option>
+                              <option value="rural-west">Rural West</option>
+                            </select>
+                            {registerErrors.constituency && <span className="field-error">{registerErrors.constituency}</span>}
+                          </div>
+                        </div>
                       </div>
-                      <div className="form-field">
-                        <label htmlFor="regStreet">Street/Area *</label>
-                        <input
-                          id="regStreet"
-                          type="text"
-                          value={registerForm.street}
-                          onChange={(e) => handleRegisterChange('street', e.target.value)}
-                        />
-                        {registerErrors.street && <span className="field-error">{registerErrors.street}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regCity">City *</label>
-                        <input
-                          id="regCity"
-                          type="text"
-                          value={registerForm.city}
-                          onChange={(e) => handleRegisterChange('city', e.target.value)}
-                        />
-                        {registerErrors.city && <span className="field-error">{registerErrors.city}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regState">State *</label>
-                        <select
-                          id="regState"
-                          value={registerForm.state}
-                          onChange={(e) => {
-                            handleRegisterChange('state', e.target.value);
-                            handleRegisterChange('district', '');
-                          }}
-                        >
-                          <option value="">-- Select --</option>
-                          {getRegisterStates().map((stateCode) => (
-                            <option key={stateCode} value={stateCode}>{getStateLabel(stateCode)}</option>
-                          ))}
-                        </select>
-                        {registerErrors.state && <span className="field-error">{registerErrors.state}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regDistrict">District *</label>
-                        <select
-                          id="regDistrict"
-                          value={registerForm.district}
-                          onChange={(e) => handleRegisterChange('district', e.target.value)}
-                          disabled={!registerForm.state}
-                        >
-                          <option value="">-- Select --</option>
-                          {getRegisterDistricts(registerForm.state).map((districtCode) => (
-                            <option key={districtCode} value={districtCode}>{getDistrictLabel(districtCode)}</option>
-                          ))}
-                        </select>
-                        {registerErrors.district && <span className="field-error">{registerErrors.district}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regPin">PIN Code *</label>
-                        <input
-                          id="regPin"
-                          type="text"
-                          inputMode="numeric"
-                          maxLength="6"
-                          value={registerForm.pin}
-                          onChange={(e) => handleRegisterChange('pin', e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        />
-                        {registerErrors.pin && <span className="field-error">{registerErrors.pin}</span>}
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="regConstituency">Constituency *</label>
-                        <select
-                          id="regConstituency"
-                          value={registerForm.constituency}
-                          onChange={(e) => handleRegisterChange('constituency', e.target.value)}
-                        >
-                          <option value="">-- Select --</option>
-                          <option value="urban-north">Urban North</option>
-                          <option value="urban-south">Urban South</option>
-                          <option value="rural-east">Rural East</option>
-                          <option value="rural-west">Rural West</option>
-                        </select>
-                        {registerErrors.constituency && <span className="field-error">{registerErrors.constituency}</span>}
-                      </div>
-                    </div>
-                  </div>
 
-
-
-                  <div className="form-section declaration-section">
-                    <label className="declaration-row">
-                      <input
-                        type="checkbox"
-                        checked={registerForm.declaration}
-                        onChange={(e) => handleRegisterChange('declaration', e.target.checked)}
-                      />
-                      <span>I confirm that I am 18 years or older and a citizen of India.</span>
-                    </label>
-                    {registerErrors.declaration && <span className="field-error">{registerErrors.declaration}</span>}
-                  </div>
+                      <div className="form-section declaration-section">
+                        <label className="declaration-row">
+                          <input
+                            type="checkbox"
+                            checked={registerForm.declaration}
+                            onChange={(e) => handleRegisterChange('declaration', e.target.checked)}
+                          />
+                          <span>I confirm that I am 18 years or older and a citizen of India.</span>
+                        </label>
+                        {registerErrors.declaration && <span className="field-error">{registerErrors.declaration}</span>}
+                      </div>
 
                       <div className="register-actions">
                         <button className="register-submit" type="submit">Submit Registration</button>
