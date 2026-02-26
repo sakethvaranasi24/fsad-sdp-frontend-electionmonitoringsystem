@@ -422,12 +422,6 @@ function CitizenPortal({ onLogout }) {
         { id: 4, name: 'Rajpath Community Center', address: 'Rajpath, New Delhi', status: 'operational', queue: 16, distance: '3.2 km', mapUrl: 'https://maps.google.com/?q=Rajpath+New+Delhi' }
       ]
     },
-    'Karnataka': {
-      'Bangalore': [
-        { id: 5, name: 'MG Road Municipal School', address: 'MG Road, Brigade Road Junction, Bangalore', status: 'delayed', queue: 35, distance: '4.5 km', mapUrl: 'https://maps.google.com/?q=MG+Road+Bangalore' },
-        { id: 6, name: 'Indiranagar Community Hall', address: 'Indiranagar, Bangalore', status: 'operational', queue: 19, distance: '6.2 km', mapUrl: 'https://maps.google.com/?q=Indiranagar+Bangalore' }
-      ]
-    },
     'Tamil Nadu': {
       'Chennai': [
         { id: 9, name: 'Anna Nagar Community Center', address: '2nd Avenue, Anna Nagar West, Chennai', status: 'operational', queue: 14, distance: '2.7 km', mapUrl: 'https://maps.google.com/?q=Anna+Nagar+Chennai' },
@@ -442,86 +436,6 @@ function CitizenPortal({ onLogout }) {
       'Kolkata': [
         { id: 11, name: 'Salt Lake City Center', address: 'Sector V, Salt Lake City, Kolkata', status: 'operational', queue: 9, distance: '5.8 km', mapUrl: 'https://maps.google.com/?q=Salt+Lake+City+Kolkata' },
         { id: 12, name: 'Park Circus Community Hall', address: 'Park Circus, Kolkata', status: 'operational', queue: 17, distance: '3.1 km', mapUrl: 'https://maps.google.com/?q=Park+Circus+Kolkata' }
-      ]
-    },
-    'Telangana': {
-      'Hyderabad': [
-        { id: 13, name: 'Cyberabad IT Park Hall', address: 'HITEC City, Madhapur, Hyderabad', status: 'operational', queue: 22, distance: '4.0 km', mapUrl: 'https://maps.google.com/?q=HITEC+City+Hyderabad' },
-        { id: 14, name: 'Banjara Hills Community Center', address: 'Banjara Hills, Hyderabad', status: 'operational', queue: 13, distance: '6.5 km', mapUrl: 'https://maps.google.com/?q=Banjara+Hills+Hyderabad' }
-      ]
-    },
-    'Uttar Pradesh': {
-      'Lucknow': [
-        { id: 15, name: 'Hazratganj Public Library', address: 'Park Road, Hazratganj, Lucknow', status: 'delayed', queue: 28, distance: '3.5 km', mapUrl: 'https://maps.google.com/?q=Hazratganj+Lucknow' },
-        { id: 16, name: 'Gomti Nagar Community Hall', address: 'Gomti Nagar, Lucknow', status: 'operational', queue: 8, distance: '5.4 km', mapUrl: 'https://maps.google.com/?q=Gomti+Nagar+Lucknow' }
-      ],
-      'Agra': [
-        { id: 21, name: 'Taj Nagar Community Hall', address: 'Taj Nagar, Agra', status: 'operational', queue: 19, distance: '2.1 km', mapUrl: 'https://maps.google.com/?q=Agra+Uttar+Pradesh' },
-        { id: 22, name: 'Fatehabad Village Booth', address: 'Fatehabad, Agra', status: 'operational', queue: 13, distance: '8.3 km', mapUrl: 'https://maps.google.com/?q=Fatehabad+Agra' }
-      ],
-      'Varanasi': [
-        { id: 23, name: 'Kaashi Village Polling Center', address: 'Mir Ghat, Varanasi', status: 'operational', queue: 22, distance: '1.5 km', mapUrl: 'https://maps.google.com/?q=Varanasi+Uttar+Pradesh' },
-        { id: 24, name: 'Ramnagar Community School', address: 'Ramnagar, Varanasi', status: 'operational', queue: 11, distance: '9.2 km', mapUrl: 'https://maps.google.com/?q=Ramnagar+Varanasi' }
-      ]
-    },
-    'Rajasthan': {
-      'Jaipur': [
-        { id: 17, name: 'City Palace Community Center', address: 'Janpath Road, Jaipur', status: 'operational', queue: 24, distance: '3.0 km', mapUrl: 'https://maps.google.com/?q=Jaipur+Rajasthan' },
-        { id: 18, name: 'Malviya Village Polling Booth', address: 'Malviya Nagar, Jaipur', status: 'operational', queue: 15, distance: '6.8 km', mapUrl: 'https://maps.google.com/?q=Malviya+Nagar+Jaipur' }
-      ],
-      'Udaipur': [
-        { id: 19, name: 'City Palace Village Center', address: 'Haldi Ghati Road, Udaipur', status: 'operational', queue: 10, distance: '4.2 km', mapUrl: 'https://maps.google.com/?q=Udaipur+Rajasthan' },
-        { id: 20, name: 'Fateh Sagar Village School', address: 'Fateh Sagar, Udaipur', status: 'operational', queue: 8, distance: '7.5 km', mapUrl: 'https://maps.google.com/?q=Fateh+Sagar+Udaipur' }
-      ]
-    },
-    'Gujarat': {
-      'Ahmedabad': [
-        { id: 25, name: 'Sardar Patel Village Hall', address: 'Navrangpura, Ahmedabad', status: 'operational', queue: 20, distance: '3.8 km', mapUrl: 'https://maps.google.com/?q=Ahmedabad+Gujarat' },
-        { id: 26, name: 'Thaltej Village Booth', address: 'Thaltej, Ahmedabad', status: 'operational', queue: 14, distance: '7.1 km', mapUrl: 'https://maps.google.com/?q=Thaltej+Ahmedabad' }
-      ],
-      'Surat': [
-        { id: 27, name: 'Diamond City Polling Station', address: 'Piplod, Surat', status: 'operational', queue: 26, distance: '4.5 km', mapUrl: 'https://maps.google.com/?q=Surat+Gujarat' },
-        { id: 28, name: 'Katargam Village Booth', address: 'Katargam, Surat', status: 'operational', queue: 9, distance: '6.7 km', mapUrl: 'https://maps.google.com/?q=Katargam+Surat' }
-      ],
-      'Vadodara': [
-        { id: 29, name: 'Sayaji Garden Community Center', address: 'Opp Sayaji Garden, Vadodara', status: 'operational', queue: 16, distance: '2.9 km', mapUrl: 'https://maps.google.com/?q=Vadodara+Gujarat' },
-        { id: 30, name: 'Kareli Village Polling Booth', address: 'Kareli, Vadodara', status: 'operational', queue: 12, distance: '5.2 km', mapUrl: 'https://maps.google.com/?q=Kareli+Vadodara' }
-      ]
-    },
-    'Madhya Pradesh': {
-      'Bhopal': [
-        { id: 31, name: 'Van Vihar Village School', address: 'Van Vihar Road, Bhopal', status: 'operational', queue: 17, distance: '3.4 km', mapUrl: 'https://maps.google.com/?q=Bhopal+Madhya+Pradesh' },
-        { id: 32, name: 'Raisen Village Polling Center', address: 'Raisen, Bhopal', status: 'operational', queue: 10, distance: '7.8 km', mapUrl: 'https://maps.google.com/?q=Raisen+Bhopal' }
-      ],
-      'Indore': [
-        { id: 33, name: 'Madhya Marg Polling Station', address: 'Madhya Marg, Indore', status: 'operational', queue: 21, distance: '3.1 km', mapUrl: 'https://maps.google.com/?q=Indore+Madhya+Pradesh' },
-        { id: 34, name: 'Mhow Village Booth', address: 'Mhow, Indore', status: 'operational', queue: 8, distance: '6.9 km', mapUrl: 'https://maps.google.com/?q=Mhow+Indore' }
-      ]
-    },
-    'Bihar': {
-      'Patna': [
-        { id: 35, name: 'Patliputra Village Hall', address: 'Patliputra, Patna', status: 'operational', queue: 19, distance: '4.3 km', mapUrl: 'https://maps.google.com/?q=Patna+Bihar' },
-        { id: 36, name: 'Nalanda Village School', address: 'Nalanda, Patna', status: 'operational', queue: 14, distance: '8.1 km', mapUrl: 'https://maps.google.com/?q=Nalanda+Patna' }
-      ],
-      'Gaya': [
-        { id: 37, name: 'Vishnupad Temple Area Booth', address: 'Temple Road, Gaya', status: 'operational', queue: 12, distance: '2.6 km', mapUrl: 'https://maps.google.com/?q=Gaya+Bihar' },
-        { id: 38, name: 'Wazirganj Village Center', address: 'Wazirganj, Gaya', status: 'operational', queue: 9, distance: '7.4 km', mapUrl: 'https://maps.google.com/?q=Wazirganj+Gaya' }
-      ]
-    },
-    'Odisha': {
-      'Bhubaneswar': [
-        { id: 39, name: 'Nayapalli Village School', address: 'Nayapalli, Bhubaneswar', status: 'operational', queue: 15, distance: '3.7 km', mapUrl: 'https://maps.google.com/?q=Bhubaneswar+Odisha' },
-        { id: 40, name: 'Samanta Chandi Village Booth', address: 'Samanta Chandi, Bhubaneswar', status: 'operational', queue: 11, distance: '6.5 km', mapUrl: 'https://maps.google.com/?q=Samanta+Chandi+Bhubaneswar' }
-      ],
-      'Cuttack': [
-        { id: 41, name: 'Badambadi Village Center', address: 'Badambadi, Cuttack', status: 'operational', queue: 18, distance: '4.1 km', mapUrl: 'https://maps.google.com/?q=Cuttack+Odisha' },
-        { id: 42, name: 'Jagatpur Village School', address: 'Jagatpur, Cuttack', status: 'operational', queue: 7, distance: '8.2 km', mapUrl: 'https://maps.google.com/?q=Jagatpur+Cuttack' }
-      ]
-    },
-    'Andhra Pradesh': {
-      'Visakhapatnam': [
-        { id: 43, name: 'Vizag Village Polling Station', address: 'Gajuwaka, Visakhapatnam', status: 'operational', queue: 20, distance: '5.0 km', mapUrl: 'https://maps.google.com/?q=Visakhapatnam+Andhra+Pradesh' },
-        { id: 44, name: 'Atchutapuram Village Booth', address: 'Atchutapuram, Visakhapatnam', status: 'operational', queue: 10, distance: '7.8 km', mapUrl: 'https://maps.google.com/?q=Atchutapuram+Visakhapatnam' }
       ]
     },
     'Assam': {

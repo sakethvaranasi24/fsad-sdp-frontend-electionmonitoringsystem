@@ -4,7 +4,8 @@ import Dashboard from './Dashboard/Dashboard'
 import CitizenPortal from './Citizen/CitizenPortal'
 import AdminDashboard from './Admin/AdminDashboard'
 import DataAnalystsDashboard from './DataAnalysts/DataAnalystsDashboard'
-import ElectionObserverDashboard from './ElectionObserver/ElectionObserverDashboard'
+import DistrictObserverDashboard from './ElectionObserver/DistrictObserverDashboard'
+import ProtectedRoute from './ProtectedRoute'
 import './App.css'
 
 function App() {
@@ -61,15 +62,13 @@ function App() {
             )
           } 
         />
-        <Route 
-          path="/electionobserver" 
+        <Route
+          path="/electionobserver"
           element={
-            userRole === 'electionobserver' ? (
-              <ElectionObserverDashboard onLogout={handleLogout} />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          } 
+            <ProtectedRoute allowedRoles={['electionobserver']} userRole={userRole}>
+              <DistrictObserverDashboard onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
         />
         
         {/* Catch all - redirect to home */}
