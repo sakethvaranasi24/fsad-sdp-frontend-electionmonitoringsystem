@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import Dashboard from './Dashboard/Dashboard'
-import CitizenPortal from './Citizen/CitizenPortal'
+import CitizenDashboard from './Citizen/Dashboard'
 import AdminDashboard from './Admin/AdminDashboard'
-import DataAnalystsDashboard from './DataAnalysts/DataAnalystsDashboard'
-import ElectionObserverDashboard from './ElectionObserver/ElectionObserverDashboard'
-import ProtectedRoute from './ProtectedRoute'
+import DataAnalystDashboard from './DataAnalysts/Dashboard'
+import ElectionObserverDashboard from './ElectionObserver/Dashboard'
+import RoleSelection from './pages/RoleSelection'
+import AdminLogin from './pages/AdminLogin'
+import CitizenLogin from './pages/CitizenLogin'
+import DataAnalystLogin from './pages/DataAnalystLogin'
+import ElectionObserverLogin from './pages/ElectionObserverLogin'
 import './App.css'
 
 function App() {
@@ -23,20 +26,24 @@ function App() {
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Dashboard onLogin={handleLogin} />} />
-        <Route path="/home" element={<Dashboard onLogin={handleLogin} />} />
-        <Route path="/about" element={<Dashboard onLogin={handleLogin} />} />
-        <Route path="/elections" element={<Dashboard onLogin={handleLogin} />} />
-        <Route path="/results" element={<Dashboard onLogin={handleLogin} />} />
-        <Route path="/resources" element={<Dashboard onLogin={handleLogin} />} />
-        <Route path="/contact" element={<Dashboard onLogin={handleLogin} />} />
+        <Route path="/" element={<RoleSelection />} />
+        <Route path="/home" element={<RoleSelection />} />
+        <Route path="/about" element={<RoleSelection />} />
+        <Route path="/elections" element={<RoleSelection />} />
+        <Route path="/results" element={<RoleSelection />} />
+        <Route path="/resources" element={<RoleSelection />} />
+        <Route path="/contact" element={<RoleSelection />} />
+        <Route path="/login/admin" element={<AdminLogin onLogin={handleLogin} />} />
+        <Route path="/login/citizen" element={<CitizenLogin onLogin={handleLogin} />} />
+        <Route path="/login/dataanalyst" element={<DataAnalystLogin onLogin={handleLogin} />} />
+        <Route path="/login/electionobserver" element={<ElectionObserverLogin onLogin={handleLogin} />} />
         
         {/* Protected Routes - Require login */}
         <Route 
           path="/citizen" 
           element={
             userRole === 'citizen' ? (
-              <CitizenPortal onLogout={handleLogout} />
+              <CitizenDashboard onLogout={handleLogout} />
             ) : (
               <Navigate to="/" replace />
             )
@@ -56,7 +63,7 @@ function App() {
           path="/dataanalysts" 
           element={
             userRole === 'dataanalysts' ? (
-              <DataAnalystsDashboard onLogout={handleLogout} />
+              <DataAnalystDashboard onLogout={handleLogout} />
             ) : (
               <Navigate to="/" replace />
             )
@@ -65,9 +72,11 @@ function App() {
         <Route
           path="/electionobserver"
           element={
-            <ProtectedRoute allowedRoles={['electionobserver']} userRole={userRole}>
+            userRole === 'electionobserver' ? (
               <ElectionObserverDashboard onLogout={handleLogout} />
-            </ProtectedRoute>
+            ) : (
+              <Navigate to="/" replace />
+            )
           }
         />
         
