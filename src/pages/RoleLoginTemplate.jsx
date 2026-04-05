@@ -50,7 +50,7 @@ function RoleLoginTemplate({
   const [registrationError, setRegistrationError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState('');
 
-  const isAdminRole = role === 'admin';
+  const isBackendRole = role === 'admin' || role === 'citizen' || role === 'dataanalysts' || role === 'electionobserver';
 
   const resetRegistrationState = () => {
     setRegistrationUsername('');
@@ -89,7 +89,7 @@ function RoleLoginTemplate({
 
       payload = {
         username: normalizedUsername,
-        aadhaarId: normalizedAadhaar,
+        aadhaarNumber: normalizedAadhaar,
         password: registrationPassword
       };
     } else {
@@ -107,7 +107,7 @@ function RoleLoginTemplate({
     }
 
     try {
-      if (isAdminRole) {
+      if (isBackendRole) {
         const response = await fetch(registerPath, {
           method: 'POST',
           headers: {
@@ -140,7 +140,7 @@ function RoleLoginTemplate({
         users.push({
           role,
           username: registrationUsername.trim().toLowerCase(),
-          aadhaarId: registrationAadhaar.replace(/\D/g, '').slice(0, 12),
+          aadhaarNumber: registrationAadhaar.replace(/\D/g, '').slice(0, 12),
           password: registrationPassword
         });
       } else {
@@ -175,7 +175,7 @@ function RoleLoginTemplate({
     const payload = citizenMode
       ? {
           username: username.trim().toLowerCase(),
-          aadhaarId: aadhaarId.replace(/\D/g, '').slice(0, 12),
+          aadhaarNumber: aadhaarId.replace(/\D/g, '').slice(0, 12),
           password: citizenPassword
         }
       : {
@@ -184,7 +184,7 @@ function RoleLoginTemplate({
         };
 
     try {
-      if (isAdminRole) {
+      if (isBackendRole) {
         const response = await fetch(loginPath, {
           method: 'POST',
           headers: {
@@ -212,7 +212,7 @@ function RoleLoginTemplate({
         userFound = users.some(user =>
           user.role === role &&
           user.username === payload.username &&
-          user.aadhaarId === payload.aadhaarId &&
+          user.aadhaarNumber === payload.aadhaarNumber &&
           user.password === payload.password
         );
       } else {
