@@ -11,14 +11,52 @@ import DataAnalystLogin from './pages/DataAnalystLogin'
 import ElectionObserverLogin from './pages/ElectionObserverLogin'
 import './App.css'
 
-function App() {
-  const [userRole, setUserRole] = useState(null)
+const CURRENT_USER_KEY = 'user'
 
-  const handleLogin = (role) => {
-    setUserRole(role)
+function normalizeRoleToAppRole(value) {
+  if (!value || typeof value !== 'string') {
+    return null
+  }
+
+  const normalized = value.trim().toUpperCase()
+
+  if (normalized === 'ADMIN') return 'admin'
+  if (normalized === 'CITIZEN') return 'citizen'
+  if (normalized === 'DATA_ANALYST' || normalized === 'DATAANALYSTS' || normalized === 'DATA_ANALYSTS') return 'dataanalysts'
+  if (normalized === 'ELECTION_OBSERVER' || normalized === 'ELECTIONOBSERVER' || normalized === 'OBSERVER') return 'electionobserver'
+
+  const fallback = value.trim().toLowerCase()
+  if (fallback === 'admin' || fallback === 'citizen' || fallback === 'dataanalysts' || fallback === 'electionobserver') {
+    return fallback
+  }
+
+  return null
+}
+
+function getInitialRole() {
+  const currentUser = localStorage.getItem(CURRENT_USER_KEY)
+  if (!currentUser) {
+    return null
+  }
+
+  try {
+    const parsedUser = JSON.parse(currentUser)
+    return normalizeRoleToAppRole(parsedUser?.role)
+  } catch {
+    return null
+  }
+}
+
+function App() {
+  const [userRole, setUserRole] = useState(() => getInitialRole())
+
+  const handleLogin = (role, profile) => {
+    const normalizedRole = normalizeRoleToAppRole(role) || normalizeRoleToAppRole(profile?.role)
+    setUserRole(normalizedRole)
   }
 
   const handleLogout = () => {
+    localStorage.removeItem(CURRENT_USER_KEY)
     setUserRole(null)
   }
 

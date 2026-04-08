@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import '../AdminProfessional.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+function extractList(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.response)) {
+    return payload.response;
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+  return [];
+}
+
 function ViewAllAnalysts() {
   const [analysts, setAnalysts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,23 +25,46 @@ function ViewAllAnalysts() {
     loadAnalysts();
   }, []);
 
-  const loadAnalysts = () => {
-    const stored = localStorage.getItem('dataAnalysts');
-    setAnalysts(stored ? JSON.parse(stored) : []);
+  const loadAnalysts = async () => {
+    try {
+      const response = await fetch(`${API_URL}/adminapi/analyst/all`);
+
+      if (!response.ok) {
+        setAnalysts([]);
+        return;
+      }
+
+      const responseData = await response.json().catch(() => []);
+      setAnalysts(extractList(responseData));
+    } catch {
+      setAnalysts([]);
+    }
   };
 
   const filteredAnalysts = analysts.filter(analyst => {
-    const matchSearch = analyst.analystName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       analyst.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const analystName = analyst.analystName || analyst.name || '';
+    const email = analyst.email || '';
+    const matchSearch = analystName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = !filterStatus || analyst.status === filterStatus;
     return matchSearch && matchStatus;
   });
 
-  const deleteAnalyst = (id) => {
+  const deleteAnalyst = async (id) => {
     if (window.confirm('Are you sure you want to delete this analyst?')) {
-      const updated = analysts.filter(a => a.id !== id);
-      localStorage.setItem('dataAnalysts', JSON.stringify(updated));
-      setAnalysts(updated);
+      try {
+        const response = await fetch(`${API_URL}/adminapi/analyst/delete?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        setAnalysts(prev => prev.filter(a => (a.id || a.analystId) !== id));
+      } catch {
+        // no-op
+      }
     }
   };
 
@@ -88,8 +126,8 @@ function ViewAllAnalysts() {
             </thead>
             <tbody>
               {filteredAnalysts.map((analyst) => (
-                <tr key={analyst.id}>
-                  <td><strong>{analyst.analystName}</strong></td>
+                <tr key={analyst.id || analyst.analystId}>
+                  <td><strong>{analyst.analystName || analyst.name || '-'}</strong></td>
                   <td>{analyst.email}</td>
                   <td>{analyst.phone}</td>
                   <td>{analyst.expertise || '-'}</td>
@@ -99,7 +137,7 @@ function ViewAllAnalysts() {
                     <button className="admin-btn btn-sm btn-edit">✏️ Edit</button>
                     <button
                       className="admin-btn btn-sm btn-delete"
-                      onClick={() => deleteAnalyst(analyst.id)}
+                      onClick={() => deleteAnalyst(analyst.id || analyst.analystId)}
                     >
                       🗑️ Delete
                     </button>

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import '../AdminProfessional.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AddDataAnalyst({ onAnalystAdded }) {
   const [formData, setFormData] = useState({
     analystName: '',
     email: '',
+    password: '',
     phone: '',
     expertise: '',
     assignedDistrict: '',
@@ -28,25 +31,31 @@ function AddDataAnalyst({ onAnalystAdded }) {
     setMessage('');
 
     try {
-      if (!formData.analystName || !formData.email || !formData.phone) {
+      if (!formData.analystName || !formData.email || !formData.password || !formData.phone) {
         setMessage('❌ Please fill all required fields');
         setLoading(false);
         return;
       }
 
-      const analysts = JSON.parse(localStorage.getItem('dataAnalysts') || '[]');
-      const newAnalyst = {
-        id: `ANALYST-${Date.now()}`,
-        ...formData,
-        createdAt: new Date().toISOString()
-      };
-      analysts.push(newAnalyst);
-      localStorage.setItem('dataAnalysts', JSON.stringify(analysts));
+      const response = await fetch(`${API_URL}/adminapi/analyst/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        setMessage(`❌ ${errorText || 'Error adding analyst'}`);
+        return;
+      }
 
       setMessage('✅ Data Analyst added successfully!');
       setFormData({
         analystName: '',
         email: '',
+        password: '',
         phone: '',
         expertise: '',
         assignedDistrict: '',
@@ -94,6 +103,20 @@ function AddDataAnalyst({ onAnalystAdded }) {
               name="email"
               placeholder="Enter email"
               value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Password *</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter password"
+              value={formData.password}
               onChange={handleChange}
               required
             />

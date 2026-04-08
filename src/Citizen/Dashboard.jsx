@@ -10,21 +10,44 @@ import ViewReports from './ViewReports';
 import PollingStations from './PollingStations';
 import ElectionResults from './ElectionResults';
 
+const CITIZEN_PROFILE_KEY = 'emsCitizenProfile';
+
+function getCitizenProfile() {
+  const defaultProfile = {
+    name: 'John Citizen',
+    email: 'john.citizen@email.com',
+    phone: '+91 98765 43210',
+    voterId: `VID-${Date.now()}`,
+    status: 'Registered',
+    registrationDate: new Date().toLocaleDateString(),
+    district: '',
+    state: ''
+  };
+
+  const storedProfile = localStorage.getItem(CITIZEN_PROFILE_KEY);
+  if (!storedProfile) {
+    return defaultProfile;
+  }
+
+  try {
+    const parsedProfile = JSON.parse(storedProfile);
+    return {
+      ...defaultProfile,
+      ...parsedProfile,
+      name: parsedProfile?.citizenName || parsedProfile?.name || defaultProfile.name
+    };
+  } catch {
+    return defaultProfile;
+  }
+}
+
 function Dashboard({ onLogout }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileDropdownRef = useRef(null);
-
-  const citizenProfile = {
-    name: 'John Citizen',
-    email: 'john.citizen@email.com',
-    phone: '+91 98765 43210',
-    voterId: 'VID-' + Date.now(),
-    status: 'Registered',
-    registrationDate: new Date().toLocaleDateString(),
-    district: 'Central District'
-  };
+  const [citizenProfile, setCitizenProfile] = useState(() => getCitizenProfile());
+  const [locationForm, setLocationForm] = useState({ state: '', district: '' });
 
   const citizenInitials = citizenProfile.name
     .split(' ')
@@ -37,6 +60,17 @@ function Dashboard({ onLogout }) {
       onLogout();
       navigate('/');
     }
+  };
+
+  const handleLocationSave = () => {
+    const updatedProfile = {
+      ...citizenProfile,
+      state: locationForm.state.trim(),
+      district: locationForm.district.trim()
+    };
+
+    setCitizenProfile(updatedProfile);
+    localStorage.setItem(CITIZEN_PROFILE_KEY, JSON.stringify(updatedProfile));
   };
 
   // Profile dropdown click outside handler
@@ -53,6 +87,13 @@ function Dashboard({ onLogout }) {
     };
   }, []);
 
+  useEffect(() => {
+    setLocationForm({
+      state: citizenProfile.state || '',
+      district: citizenProfile.district || ''
+    });
+  }, [citizenProfile]);
+
   const renderContent = () => {
     switch(activeTab) {
       case 'elections':
@@ -64,7 +105,12 @@ function Dashboard({ onLogout }) {
       case 'viewReports':
         return <ViewReports />;
       case 'pollingStations':
-        return <PollingStations />;
+        return (
+          <PollingStations
+            preferredState={citizenProfile.state}
+            preferredDistrict={citizenProfile.district}
+          />
+        );
       case 'dashboard':
       default:
         return (
@@ -140,8 +186,37 @@ function Dashboard({ onLogout }) {
                   <p><strong>Phone:</strong> {citizenProfile.phone}</p>
                   <p><strong>Voter ID:</strong> {citizenProfile.voterId}</p>
                   <p><strong>Status:</strong> <span className="status-active">{citizenProfile.status}</span></p>
-                  <p><strong>District:</strong> {citizenProfile.district}</p>
+                  <p><strong>State:</strong> {citizenProfile.state || 'Not Set'}</p>
+                  <p><strong>District:</strong> {citizenProfile.district || 'Not Set'}</p>
                   <p><strong>Registered:</strong> {citizenProfile.registrationDate}</p>
+                  <div className="form-group" style={{ marginTop: '12px' }}>
+                    <label htmlFor="citizen-state">State</label>
+                    <input
+                      id="citizen-state"
+                      type="text"
+                      placeholder="Enter your state"
+                      value={locationForm.state}
+                      onChange={(e) => setLocationForm((prev) => ({ ...prev, state: e.target.value }))}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="citizen-district">District</label>
+                    <input
+                      id="citizen-district"
+                      type="text"
+                      placeholder="Enter your district"
+                      value={locationForm.district}
+                      onChange={(e) => setLocationForm((prev) => ({ ...prev, district: e.target.value }))}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="card-btn"
+                    style={{ width: '100%', marginTop: '8px' }}
+                    onClick={handleLocationSave}
+                  >
+                    Save Location
+                  </button>
                 </div>
                 <button className="dropdown-btn danger" onClick={handleLogoutClick}>
                   Logout

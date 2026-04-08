@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import '../AdminProfessional.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+function extractList(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.response)) {
+    return payload.response;
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+  return [];
+}
+
 function ViewAllObservers() {
   const [observers, setObservers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,23 +25,46 @@ function ViewAllObservers() {
     loadObservers();
   }, []);
 
-  const loadObservers = () => {
-    const stored = localStorage.getItem('observers');
-    setObservers(stored ? JSON.parse(stored) : []);
+  const loadObservers = async () => {
+    try {
+      const response = await fetch(`${API_URL}/adminapi/observer/all`);
+
+      if (!response.ok) {
+        setObservers([]);
+        return;
+      }
+
+      const responseData = await response.json().catch(() => []);
+      setObservers(extractList(responseData));
+    } catch {
+      setObservers([]);
+    }
   };
 
   const filteredObservers = observers.filter(obs => {
-    const matchSearch = obs.observerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       obs.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const observerName = obs.observerName || obs.name || '';
+    const email = obs.email || '';
+    const matchSearch = observerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = !filterStatus || obs.status === filterStatus;
     return matchSearch && matchStatus;
   });
 
-  const deleteObserver = (id) => {
+  const deleteObserver = async (email) => {
     if (window.confirm('Are you sure you want to delete this observer?')) {
-      const updated = observers.filter(o => o.id !== id);
-      localStorage.setItem('observers', JSON.stringify(updated));
-      setObservers(updated);
+      try {
+        const response = await fetch(`${API_URL}/adminapi/observer/delete?email=${encodeURIComponent(email)}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        setObservers(prev => prev.filter(o => o.email !== email));
+      } catch {
+        // no-op
+      }
     }
   };
 
@@ -88,8 +126,8 @@ function ViewAllObservers() {
             </thead>
             <tbody>
               {filteredObservers.map((obs) => (
-                <tr key={obs.id}>
-                  <td><strong>{obs.observerName}</strong></td>
+                <tr key={obs.email}>
+                  <td><strong>{obs.observerName || obs.name || '-'}</strong></td>
                   <td>{obs.email}</td>
                   <td>{obs.phone}</td>
                   <td>{obs.district || '-'}</td>
@@ -99,7 +137,7 @@ function ViewAllObservers() {
                     <button className="admin-btn btn-sm btn-edit">✏️ Edit</button>
                     <button
                       className="admin-btn btn-sm btn-delete"
-                      onClick={() => deleteObserver(obs.id)}
+                      onClick={() => deleteObserver(obs.email)}
                     >
                       🗑️ Delete
                     </button>
