@@ -17,18 +17,10 @@ import AddDataAnalyst from './DataAnalyst/AddDataAnalyst';
 import ViewAllAnalysts from './DataAnalyst/ViewAllAnalysts';
 import AssignDistrict from './DataAnalyst/AssignDistrict';
 
-function AdminDashboard({ onLogout }) {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [activeSubTab, setActiveSubTab] = useState('view');
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const profileDropdownRef = useRef(null);
+const ADMIN_PROFILE_KEY = 'emsAdminProfile';
 
-
- 
-
-  const adminProfile = {
+function getAdminProfile() {
+  const defaultProfile = {
     name: 'System Administrator',
     email: 'admin@system.com',
     phone: '+94 77 123 4567',
@@ -36,15 +28,54 @@ function AdminDashboard({ onLogout }) {
     adminId: 'ADM-0001',
     accountStatus: 'Active',
     accessLevel: 'Full Access',
-    lastLogin: new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: '2-digit', 
+    lastLogin: new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit'
     }),
     twoFactor: 'Enabled'
   };
+
+  const storedProfile = localStorage.getItem(ADMIN_PROFILE_KEY);
+  if (!storedProfile) {
+    return defaultProfile;
+  }
+
+  try {
+    const parsedProfile = JSON.parse(storedProfile);
+    return {
+      ...defaultProfile,
+      ...parsedProfile,
+      name: parsedProfile?.adminName || parsedProfile?.name || defaultProfile.name,
+      email: parsedProfile?.email || defaultProfile.email,
+      phone: parsedProfile?.phone || defaultProfile.phone,
+      adminId: parsedProfile?.adminId || parsedProfile?.id || defaultProfile.adminId,
+      accountStatus: parsedProfile?.status || parsedProfile?.accountStatus || defaultProfile.accountStatus,
+      accessLevel: parsedProfile?.accessLevel || defaultProfile.accessLevel,
+      role: parsedProfile?.role || defaultProfile.role,
+      lastLogin: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    };
+  } catch {
+    return defaultProfile;
+  }
+}
+
+function AdminDashboard({ onLogout }) {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeSubTab, setActiveSubTab] = useState('view');
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [adminProfile] = useState(() => getAdminProfile());
+  const profileDropdownRef = useRef(null);
 
   const adminInitials = adminProfile.name
     .split(' ')
@@ -55,6 +86,7 @@ function AdminDashboard({ onLogout }) {
 
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem(ADMIN_PROFILE_KEY);
       onLogout();
       navigate('/');
     }
@@ -213,7 +245,7 @@ function AdminDashboard({ onLogout }) {
                 className={`tab-btn ${activeSubTab === 'assign' ? 'active' : ''}`}
                 onClick={() => setActiveSubTab('assign')}
               >
-                Assign to Station
+                Assign Station/District
               </button>
             </div>
             <div className="tab-content-area">

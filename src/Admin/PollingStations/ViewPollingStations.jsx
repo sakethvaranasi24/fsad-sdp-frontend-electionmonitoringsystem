@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import '../AdminProfessional.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+function extractList(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.response)) {
+    return payload.response;
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+  return [];
+}
+
 function ViewPollingStations() {
   const [stations, setStations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,25 +25,48 @@ function ViewPollingStations() {
     loadStations();
   }, []);
 
-  const loadStations = () => {
-    const stored = localStorage.getItem('pollingStations');
-    setStations(stored ? JSON.parse(stored) : []);
+  const loadStations = async () => {
+    try {
+      const response = await fetch(`${API_URL}/adminapi/polling-station/all`);
+
+      if (!response.ok) {
+        setStations([]);
+        return;
+      }
+
+      const responseData = await response.json().catch(() => []);
+      setStations(extractList(responseData));
+    } catch {
+      setStations([]);
+    }
   };
 
   const filteredStations = stations.filter(station => {
-    const matchSearch = station.stationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       station.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const stationName = station.stationName || station.name || '';
+    const location = station.location || '';
+    const matchSearch = stationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchDistrict = !filterDistrict || station.district === filterDistrict;
     return matchSearch && matchDistrict;
   });
 
   const districts = [...new Set(stations.map(s => s.district))];
 
-  const deleteStation = (id) => {
+  const deleteStation = async (id) => {
     if (window.confirm('Are you sure you want to delete this station?')) {
-      const updated = stations.filter(s => s.id !== id);
-      localStorage.setItem('pollingStations', JSON.stringify(updated));
-      setStations(updated);
+      try {
+        const response = await fetch(`${API_URL}/adminapi/polling-station/delete?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        setStations(prev => prev.filter(s => (s.id || s.stationId) !== id));
+      } catch {
+        // no-op
+      }
     }
   };
 
@@ -76,8 +114,8 @@ function ViewPollingStations() {
             </thead>
             <tbody>
               {filteredStations.map((station) => (
-                <tr key={station.id}>
-                  <td><strong>{station.stationName}</strong></td>
+                <tr key={station.id || station.stationId}>
+                  <td><strong>{station.stationName || station.name || '-'}</strong></td>
                   <td>{station.location}</td>
                   <td>{station.district}</td>
                   <td>{station.state || '-'}</td>
@@ -86,7 +124,7 @@ function ViewPollingStations() {
                     <button className="admin-btn btn-sm btn-edit">✏️ Edit</button>
                     <button
                       className="admin-btn btn-sm btn-delete"
-                      onClick={() => deleteStation(station.id)}
+                      onClick={() => deleteStation(station.id || station.stationId)}
                     >
                       🗑️ Delete
                     </button>

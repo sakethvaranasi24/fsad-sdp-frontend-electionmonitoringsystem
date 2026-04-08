@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import '../AdminProfessional.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AddPollingStation({ onStationAdded }) {
   const [formData, setFormData] = useState({
     stationName: '',
@@ -35,22 +37,17 @@ function AddPollingStation({ onStationAdded }) {
         return;
       }
 
-      // API call placeholder
-      // const response = await fetch(`${API_URL}/adminapi/polling-station`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      const response = await fetch(`${API_URL}/adminapi/polling-station/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
 
-      // For now, store in localStorage
-      const stations = JSON.parse(localStorage.getItem('pollingStations') || '[]');
-      const newStation = {
-        id: `STATION-${Date.now()}`,
-        ...formData,
-        createdAt: new Date().toISOString()
-      };
-      stations.push(newStation);
-      localStorage.setItem('pollingStations', JSON.stringify(stations));
+      if (!response.ok) {
+        const errorText = await response.text();
+        setMessage(`❌ ${errorText || 'Error adding polling station'}`);
+        return;
+      }
 
       setMessage('✅ Polling station added successfully!');
       setFormData({

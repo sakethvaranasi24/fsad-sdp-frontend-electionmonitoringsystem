@@ -3,6 +3,39 @@ import { useNavigate } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
 
 const REGISTERED_USERS_KEY = 'emsRegisteredUsers';
+const CURRENT_USER_KEY = 'user';
+const ADMIN_PROFILE_KEY = 'emsAdminProfile';
+const OBSERVER_PROFILE_KEY = 'emsObserverProfile';
+const ANALYST_PROFILE_KEY = 'emsAnalystProfile';
+const CITIZEN_PROFILE_KEY = 'emsCitizenProfile';
+
+function normalizeRoleToAppRole(value) {
+  if (!value || typeof value !== 'string') {
+    return null;
+  }
+
+  const normalized = value.trim().toUpperCase();
+
+  if (normalized === 'ADMIN') {
+    return 'admin';
+  }
+  if (normalized === 'CITIZEN') {
+    return 'citizen';
+  }
+  if (normalized === 'DATA_ANALYST' || normalized === 'DATAANALYSTS' || normalized === 'DATA_ANALYSTS') {
+    return 'dataanalysts';
+  }
+  if (normalized === 'ELECTION_OBSERVER' || normalized === 'ELECTIONOBSERVER' || normalized === 'OBSERVER') {
+    return 'electionobserver';
+  }
+
+  const fallback = value.trim().toLowerCase();
+  if (fallback === 'admin' || fallback === 'citizen' || fallback === 'dataanalysts' || fallback === 'electionobserver') {
+    return fallback;
+  }
+
+  return null;
+}
 
 function getRegisteredUsers() {
   const storedUsers = localStorage.getItem(REGISTERED_USERS_KEY);
@@ -50,7 +83,7 @@ function RoleLoginTemplate({
   const [registrationError, setRegistrationError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState('');
 
-  const isAdminRole = role === 'admin';
+  const isBackendRole = role === 'admin' || role === 'citizen' || role === 'dataanalysts' || role === 'electionobserver';
 
   const resetRegistrationState = () => {
     setRegistrationUsername('');
@@ -89,7 +122,7 @@ function RoleLoginTemplate({
 
       payload = {
         username: normalizedUsername,
-        aadhaarId: normalizedAadhaar,
+        aadhaarNumber: normalizedAadhaar,
         password: registrationPassword
       };
     } else {
@@ -107,7 +140,7 @@ function RoleLoginTemplate({
     }
 
     try {
-      if (isAdminRole) {
+      if (isBackendRole) {
         const response = await fetch(registerPath, {
           method: 'POST',
           headers: {
@@ -140,7 +173,7 @@ function RoleLoginTemplate({
         users.push({
           role,
           username: registrationUsername.trim().toLowerCase(),
-          aadhaarId: registrationAadhaar.replace(/\D/g, '').slice(0, 12),
+          aadhaarNumber: registrationAadhaar.replace(/\D/g, '').slice(0, 12),
           password: registrationPassword
         });
       } else {
@@ -175,7 +208,7 @@ function RoleLoginTemplate({
     const payload = citizenMode
       ? {
           username: username.trim().toLowerCase(),
-          aadhaarId: aadhaarId.replace(/\D/g, '').slice(0, 12),
+          aadhaarNumber: aadhaarId.replace(/\D/g, '').slice(0, 12),
           password: citizenPassword
         }
       : {
@@ -184,7 +217,7 @@ function RoleLoginTemplate({
         };
 
     try {
-      if (isAdminRole) {
+      if (isBackendRole) {
         const response = await fetch(loginPath, {
           method: 'POST',
           headers: {
@@ -199,8 +232,34 @@ function RoleLoginTemplate({
           return;
         }
 
-        onLogin(role);
-        navigate(`/${role}`);
+        const loginData = await response.json().catch(() => null);
+        const responseObject = loginData?.response && typeof loginData.response === 'object'
+          ? loginData.response
+          : loginData;
+
+        if (responseObject && typeof responseObject === 'object') {
+          localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(responseObject));
+
+          if (role === 'admin') {
+            localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(responseObject));
+          }
+
+          if (role === 'electionobserver') {
+            localStorage.setItem(OBSERVER_PROFILE_KEY, JSON.stringify(responseObject));
+          }
+
+          if (role === 'dataanalysts') {
+            localStorage.setItem(ANALYST_PROFILE_KEY, JSON.stringify(responseObject));
+          }
+
+          if (role === 'citizen') {
+            localStorage.setItem(CITIZEN_PROFILE_KEY, JSON.stringify(responseObject));
+          }
+        }
+
+        const resolvedRole = normalizeRoleToAppRole(responseObject?.role) || role;
+        onLogin(resolvedRole, responseObject);
+        navigate(`/${resolvedRole}`);
         return;
       }
 
@@ -212,7 +271,7 @@ function RoleLoginTemplate({
         userFound = users.some(user =>
           user.role === role &&
           user.username === payload.username &&
-          user.aadhaarId === payload.aadhaarId &&
+          user.aadhaarNumber === payload.aadhaarNumber &&
           user.password === payload.password
         );
       } else {

@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import '../AdminProfessional.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+function extractList(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.response)) {
+    return payload.response;
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+  return [];
+}
+
 function AssignDistrict() {
   const [analysts, setAnalysts] = useState([]);
   const [selectedAnalyst, setSelectedAnalyst] = useState('');
@@ -16,12 +31,22 @@ function AssignDistrict() {
     loadAnalysts();
   }, []);
 
-  const loadAnalysts = () => {
-    const analysts = JSON.parse(localStorage.getItem('dataAnalysts') || '[]');
-    setAnalysts(analysts);
+  const loadAnalysts = async () => {
+    try {
+      const response = await fetch(`${API_URL}/adminapi/analyst/all`);
+      if (!response.ok) {
+        setAnalysts([]);
+        return;
+      }
+
+      const responseData = await response.json().catch(() => []);
+      setAnalysts(extractList(responseData));
+    } catch {
+      setAnalysts([]);
+    }
   };
 
-  const handleAssign = (e) => {
+  const handleAssign = async (e) => {
     e.preventDefault();
     
     if (!selectedAnalyst || !selectedDistrict) {
@@ -29,17 +54,35 @@ function AssignDistrict() {
       return;
     }
 
-    const updated = analysts.map(analyst => 
-      analyst.id === selectedAnalyst 
-        ? { ...analyst, assignedDistrict: selectedDistrict }
-        : analyst
-    );
-    
-    localStorage.setItem('dataAnalysts', JSON.stringify(updated));
-    setAnalysts(updated);
-    setMessage('✅ District assigned successfully!');
-    setSelectedAnalyst('');
-    setSelectedDistrict('');
+    try {
+      const response = await fetch(`${API_URL}/adminapi/analyst/assign-district`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: selectedAnalyst,
+          district: selectedDistrict
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        setMessage(`❌ ${errorText || 'Failed to assign district'}`);
+        return;
+      }
+
+      setAnalysts((prev) => prev.map((analyst) =>
+        analyst.email === selectedAnalyst
+          ? { ...analyst, district: selectedDistrict, assignedDistrict: selectedDistrict }
+          : analyst
+      ));
+      setMessage('✅ District assigned successfully!');
+      setSelectedAnalyst('');
+      setSelectedDistrict('');
+    } catch {
+      setMessage('❌ Unable to assign district. Please try again.');
+    }
     
     setTimeout(() => setMessage(''), 3000);
   };
@@ -65,8 +108,8 @@ function AssignDistrict() {
             >
               <option value="">-- Choose Analyst --</option>
               {analysts.map(analyst => (
-                <option key={analyst.id} value={analyst.id}>
-                  {analyst.analystName} ({analyst.email})
+                <option key={analyst.id || analyst.analystId || analyst.email} value={analyst.email}>
+                  {analyst.analystName || analyst.name} ({analyst.email})
                 </option>
               ))}
             </select>
@@ -96,13 +139,13 @@ function AssignDistrict() {
 
       <div className="admin-info-box">
         <h3>Current Assignments</h3>
-        {analysts.filter(a => a.assignedDistrict).length === 0 ? (
+        {analysts.filter(a => a.district || a.assignedDistrict).length === 0 ? (
           <p>No assignments yet</p>
         ) : (
           <ul>
-            {analysts.filter(a => a.assignedDistrict).map(analyst => (
-              <li key={analyst.id}>
-                <strong>{analyst.analystName}</strong> → {analyst.assignedDistrict}
+            {analysts.filter(a => a.district || a.assignedDistrict).map(analyst => (
+              <li key={analyst.id || analyst.analystId || analyst.email}>
+                <strong>{analyst.analystName || analyst.name}</strong> → {analyst.district || analyst.assignedDistrict}
               </li>
             ))}
           </ul>

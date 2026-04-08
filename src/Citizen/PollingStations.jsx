@@ -1,23 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-function PollingStations() {
-  const [selectedDistrict, setSelectedDistrict] = useState('');
+const API_URL = import.meta.env.VITE_API_URL;
+
+function normalizeStations(payload) {
+  const items = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.response)
+      ? payload.response
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : [];
+
+  return items.map((station, index) => ({
+    id: station.id || station.stationId || `station-${index}`,
+    name: station.stationName || station.name || 'Polling Station',
+    location: station.location || station.address || station.area || '-',
+    district: station.district || '-',
+    state: station.state || '-',
+    facilities: Array.isArray(station.facilities) ? station.facilities : []
+  }));
+}
+
+function PollingStations({ preferredState = '', preferredDistrict = '' }) {
+  const [selectedState, setSelectedState] = useState(preferredState);
+  const [selectedDistrict, setSelectedDistrict] = useState(preferredDistrict);
   const [searchTerm, setSearchTerm] = useState('');
+  const [stations, setStations] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fetchError, setFetchError] = useState('');
 
-  const mockStations = [
-    { id: 1, name: 'Central High School', location: 'Downtown', district: 'District 1', facilities: ['Wheelchair Access', 'Drinking Water', 'Rest Area'] },
-    { id: 2, name: 'Community Center', location: 'North Zone', district: 'District 1', facilities: ['Wheelchair Access', 'Parking'] },
-    { id: 3, name: 'City Library', location: 'South Zone', district: 'District 2', facilities: ['Drinking Water', 'Rest Area'] },
-    { id: 4, name: 'Government School', location: 'East Zone', district: 'District 2', facilities: ['Wheelchair Access', 'Drinking Water'] }
-  ];
+  useEffect(() => {
+    setSelectedState(preferredState);
+    setSelectedDistrict(preferredDistrict);
+  }, [preferredState, preferredDistrict]);
 
-  const districts = ['District 1', 'District 2'];
+  useEffect(() => {
+    const fetchStations = async () => {
+      setIsLoading(true);
+      setFetchError('');
 
-  const filteredStations = mockStations.filter(station => {
+      try {
+        const endpoint = selectedDistrict
+          ? `${API_URL}/citizenapi/polling-stations/by-district?district=${encodeURIComponent(selectedDistrict)}`
+          : `${API_URL}/citizenapi/polling-stations/all`;
+        const response = await fetch(endpoint);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          setFetchError(errorText || 'Unable to load polling stations.');
+          setStations([]);
+          return;
+        }
+
+        const responseData = await response.json().catch(() => []);
+        setStations(normalizeStations(responseData));
+      } catch {
+        setFetchError('Unable to load polling stations.');
+        setStations([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStations();
+  }, [selectedDistrict]);
+
+  const availableStates = useMemo(
+    () => [...new Set(stations.map((station) => station.state).filter(Boolean))],
+    [stations]
+  );
+
+  const availableDistricts = useMemo(
+    () => [...new Set(stations.map((station) => station.district).filter(Boolean))],
+    [stations]
+  );
+
+  const filteredStations = stations.filter(station => {
+    const matchState = !selectedState || station.state === selectedState;
     const matchDistrict = !selectedDistrict || station.district === selectedDistrict;
     const matchSearch = station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                        station.location.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchDistrict && matchSearch;
+    return matchState && matchDistrict && matchSearch;
   });
 
   return (
@@ -31,6 +94,19 @@ function PollingStations() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         <div className="form-group">
+          <label htmlFor="stateFilter">Filter by State</label>
+          <select
+            id="stateFilter"
+            value={selectedState}
+            onChange={(e) => setSelectedState(e.target.value)}
+          >
+            <option value="">All States</option>
+            {availableStates.map(state => (
+              <option key={state} value={state}>{state}</option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
           <label htmlFor="districtFilter">Filter by District</label>
           <select
             id="districtFilter"
@@ -38,7 +114,7 @@ function PollingStations() {
             onChange={(e) => setSelectedDistrict(e.target.value)}
           >
             <option value="">All Districts</option>
-            {districts.map(district => (
+            {availableDistricts.map(district => (
               <option key={district} value={district}>{district}</option>
             ))}
           </select>
@@ -54,6 +130,18 @@ function PollingStations() {
           />
         </div>
       </div>
+
+      {fetchError && (
+        <div style={{ marginBottom: '16px', color: '#dc2626' }}>
+          {fetchError}
+        </div>
+      )}
+
+      {isLoading && (
+        <div style={{ marginBottom: '16px', color: '#1d4ed8' }}>
+          Loading polling stations...
+        </div>
+      )}
 
       {filteredStations.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px', color: '#5a6c7d' }}>
@@ -81,6 +169,9 @@ function PollingStations() {
                 </p>
                 <p style={{ margin: '4px 0', fontSize: '0.95rem', color: '#5a6c7d' }}>
                   <strong>District:</strong> {station.district}
+                </p>
+                <p style={{ margin: '4px 0', fontSize: '0.95rem', color: '#5a6c7d' }}>
+                  <strong>State:</strong> {station.state}
                 </p>
               </div>
               <div>

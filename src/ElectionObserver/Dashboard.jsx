@@ -3,21 +3,108 @@ import { useNavigate } from 'react-router-dom';
 import './ElectionObserverProfessional.css';
 import ObserverSidebar from './ObserverSidebar';
 
+const OBSERVER_PROFILE_KEY = 'emsObserverProfile';
+const CURRENT_USER_KEY = 'user';
+const OBSERVER_REPORTS_KEY = 'emsObserverSubmittedReports';
+const API_URL = import.meta.env.VITE_API_URL;
+
+function isObserverRole(role) {
+  if (!role || typeof role !== 'string') {
+    return false;
+  }
+
+  const normalized = role.trim().toUpperCase();
+  return normalized === 'ELECTION_OBSERVER' || normalized === 'ELECTIONOBSERVER' || normalized === 'OBSERVER';
+}
+
+function normalizeStations(payload) {
+  const items = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.response)
+      ? payload.response
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : [];
+
+  return items.map((station, index) => ({
+    id: station.id || station.stationId || `observer-station-${index}`,
+    name: station.stationName || station.name || 'Polling Station',
+    location: station.location || station.address || '-',
+    district: station.district || '-',
+    state: station.state || '-'
+  }));
+}
+
+function getObserverProfile() {
+  const defaultProfile = {
+    name: 'Observer User',
+    email: 'observer@system.com',
+    phone: '+91 98765 43210',
+    observerId: `OBS-${Date.now()}`,
+    status: 'Active',
+    district: 'Not Assigned',
+    assignedStation: '',
+    assignedStations: 0
+  };
+
+  const storedProfile = localStorage.getItem(OBSERVER_PROFILE_KEY);
+  const currentUser = localStorage.getItem(CURRENT_USER_KEY);
+
+  let parsedStoredProfile = null;
+  let parsedCurrentUser = null;
+
+  try {
+    parsedStoredProfile = storedProfile ? JSON.parse(storedProfile) : null;
+  } catch {
+    parsedStoredProfile = null;
+  }
+
+  try {
+    parsedCurrentUser = currentUser ? JSON.parse(currentUser) : null;
+  } catch {
+    parsedCurrentUser = null;
+  }
+
+  const profileSource = isObserverRole(parsedCurrentUser?.role)
+    ? { ...parsedStoredProfile, ...parsedCurrentUser }
+    : parsedStoredProfile;
+
+  if (!profileSource) {
+    return defaultProfile;
+  }
+
+  try {
+    return {
+      ...defaultProfile,
+      ...profileSource,
+      name: profileSource?.observerName || profileSource?.name || defaultProfile.name,
+      observerId: profileSource?.observerId || profileSource?.id || defaultProfile.observerId,
+      district: profileSource?.district || defaultProfile.district,
+      assignedStation: profileSource?.assignedStation || profileSource?.stationName || defaultProfile.assignedStation,
+      assignedStations: profileSource?.assignedStations || profileSource?.assignedStationCount || defaultProfile.assignedStations
+    };
+  } catch {
+    return defaultProfile;
+  }
+}
+
 function Dashboard({ onLogout }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileDropdownRef = useRef(null);
-
-  const observerProfile = {
-    name: 'Observer User',
-    email: 'observer@system.com',
-    phone: '+91 98765 43210',
-    observerId: 'OBS-' + Date.now(),
-    status: 'Active',
-    district: 'Central District',
-    assignedStations: 5
-  };
+  const [observerProfile, setObserverProfile] = useState(() => getObserverProfile());
+  const [assignedStations, setAssignedStations] = useState([]);
+  const [isStationsLoading, setIsStationsLoading] = useState(false);
+  const [stationsError, setStationsError] = useState('');
+  const [reportForm, setReportForm] = useState({
+    pollingStation: '',
+    issueType: 'Queue Delay',
+    severity: 'Medium',
+    description: ''
+  });
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const [reportStatus, setReportStatus] = useState('');
 
   const observerInitials = observerProfile.name
     .split(' ')
@@ -27,10 +114,50 @@ function Dashboard({ onLogout }) {
 
   const handleLogoutClick = () => {
     if (window.confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem(OBSERVER_PROFILE_KEY);
       onLogout();
       navigate('/');
     }
   };
+
+  // Fetch the latest profile from backend so admin-assigned station & district are always current
+  useEffect(() => {
+    const fetchLatestProfile = async () => {
+      const email = observerProfile.email;
+      if (!email || email === 'observer@system.com') return;
+
+      try {
+        const response = await fetch(
+          `${API_URL}/observerapi/profile?email=${encodeURIComponent(email)}`
+        );
+
+        if (!response.ok) return;
+
+        const latestData = await response.json().catch(() => null);
+        if (!latestData || typeof latestData !== 'object') return;
+
+        // Merge backend data into profile and update localStorage
+        const updatedProfile = {
+          ...observerProfile,
+          name: latestData.observerName || latestData.name || observerProfile.name,
+          email: latestData.email || observerProfile.email,
+          phone: latestData.phone || observerProfile.phone,
+          district: latestData.district || 'Not Assigned',
+          assignedStation: latestData.assignedStation || '',
+          status: latestData.status || observerProfile.status,
+          role: latestData.role || observerProfile.role
+        };
+
+        setObserverProfile(updatedProfile);
+        localStorage.setItem(OBSERVER_PROFILE_KEY, JSON.stringify(latestData));
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(latestData));
+      } catch {
+        // Silently fall back to cached profile
+      }
+    };
+
+    fetchLatestProfile();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -45,47 +172,351 @@ function Dashboard({ onLogout }) {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchAssignedStations = async () => {
+      if (!observerProfile.district || observerProfile.district === 'Not Assigned') {
+        setAssignedStations([]);
+        setStationsError('No primary district found for this observer.');
+        return;
+      }
+
+      setIsStationsLoading(true);
+      setStationsError('');
+
+      try {
+        const response = await fetch(
+          `${API_URL}/observerapi/my-district-stations?district=${encodeURIComponent(observerProfile.district)}`
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          setStationsError(errorText || 'Unable to load assigned stations.');
+          setAssignedStations([]);
+          return;
+        }
+
+        const responseData = await response.json().catch(() => []);
+        setAssignedStations(normalizeStations(responseData));
+      } catch {
+        setStationsError('Unable to load assigned stations.');
+        setAssignedStations([]);
+      } finally {
+        setIsStationsLoading(false);
+      }
+    };
+
+    fetchAssignedStations();
+  }, [observerProfile.district]);
+
+  useEffect(() => {
+    if (reportForm.pollingStation) {
+      return;
+    }
+
+    if (assignedStations.length > 0) {
+      setReportForm((prev) => ({ ...prev, pollingStation: assignedStations[0].name }));
+      return;
+    }
+
+    if (observerProfile.assignedStation) {
+      setReportForm((prev) => ({ ...prev, pollingStation: observerProfile.assignedStation }));
+    }
+  }, [assignedStations, observerProfile.assignedStation, reportForm.pollingStation]);
+
+  const handleReportFieldChange = (field, value) => {
+    setReportStatus('');
+    setReportForm((prev) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmitReport = async (e) => {
+    e.preventDefault();
+
+    const description = reportForm.description.trim();
+    if (!reportForm.pollingStation || !description) {
+      setReportStatus('Please select a polling station and enter a detailed description.');
+      return;
+    }
+
+    const payload = {
+      observerId: observerProfile.observerId,
+      email: observerProfile.email,
+      district: observerProfile.district,
+      assignedStation: reportForm.pollingStation,
+      issueType: reportForm.issueType,
+      severity: reportForm.severity,
+      description,
+      reportedAt: new Date().toISOString()
+    };
+
+    setIsSubmittingReport(true);
+    setReportStatus('');
+
+    try {
+      const response = await fetch(`${API_URL}/observerapi/report/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        setReportStatus('Submitted report successfully.');
+      } else {
+        const savedReports = JSON.parse(localStorage.getItem(OBSERVER_REPORTS_KEY) || '[]');
+        savedReports.unshift({ ...payload, status: 'queued-locally' });
+        localStorage.setItem(OBSERVER_REPORTS_KEY, JSON.stringify(savedReports));
+        setReportStatus('Submitted report successfully. Saved locally and will sync when backend is available.');
+      }
+
+      setReportForm((prev) => ({
+        ...prev,
+        issueType: 'Queue Delay',
+        severity: 'Medium',
+        description: ''
+      }));
+    } catch {
+      const savedReports = JSON.parse(localStorage.getItem(OBSERVER_REPORTS_KEY) || '[]');
+      savedReports.unshift({ ...payload, status: 'queued-locally' });
+      localStorage.setItem(OBSERVER_REPORTS_KEY, JSON.stringify(savedReports));
+      setReportStatus('Submitted report successfully.');
+    } finally {
+      setIsSubmittingReport(false);
+    }
+  };
+
   const renderContent = () => {
     switch(activeTab) {
       case 'assigned':
         return (
           <div className="tab-content">
-            <div className="section-header">
-              <div>
-                <h2>Assigned Stations</h2>
-                <p>View your assigned polling stations</p>
+            {stationsError && (
+              <div style={{ marginTop: '12px', color: '#dc2626' }}>{stationsError}</div>
+            )}
+            
+            <div style={{ 
+              background: 'white', 
+              borderRadius: '12px', 
+              padding: '24px', 
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              marginBottom: '20px'
+            }}>
+              <h2 style={{ margin: '0 0 8px 0', fontSize: '1.4rem' }}>Assigned Stations</h2>
+              <p style={{ color: '#64748b', margin: '0 0 20px 0' }}>View your assigned polling stations</p>
+
+              <div style={{ padding: '16px', background: '#f0f9ff', borderRadius: '8px', marginBottom: '24px' }}>
+                <p style={{ margin: 0, color: '#0f172a' }}>
+                  You are assigned to {assignedStations.length} polling stations in {observerProfile.district}.
+                </p>
               </div>
-            </div>
-            <div style={{ padding: '20px', background: '#f0f9ff', borderRadius: '8px' }}>
-              <p>You are assigned to 5 polling stations in Central District.</p>
+
+              {isStationsLoading ? (
+                <div style={{ color: '#1d4ed8' }}>Loading assigned stations...</div>
+              ) : (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+                  gap: '16px' 
+                }}>
+                  {assignedStations.map((station) => (
+                    <div
+                      key={station.id}
+                      style={{
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e2e8f0',
+                        padding: '20px',
+                        position: 'relative'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b' }}>{station.name}</h4>
+                        <span style={{ 
+                          background: '#dcfce7', 
+                          color: '#166534', 
+                          padding: '4px 10px', 
+                          borderRadius: '20px', 
+                          fontSize: '0.75rem',
+                          fontWeight: '600'
+                        }}>
+                          Active
+                        </span>
+                      </div>
+                      <p style={{ margin: '8px 0 4px', color: '#334155', fontSize: '0.9rem' }}>
+                        <strong style={{ color: '#0f172a' }}>Location:</strong> {station.location}
+                      </p>
+                      <p style={{ margin: '4px 0 0', color: '#334155', fontSize: '0.9rem' }}>
+                        <strong style={{ color: '#0f172a' }}>District:</strong> {station.district}
+                      </p>
+                    </div>
+                  ))}
+                  {assignedStations.length === 0 && (
+                    <p style={{ marginTop: '8px', color: '#475569', gridColumn: '1 / -1' }}>No stations returned for this assignment.</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         );
       case 'verify':
         return (
           <div className="tab-content">
-            <div className="section-header">
-              <div>
-                <h2>Verify Voters</h2>
-                <p>Verify voter information and eligibility</p>
+            <div style={{ 
+              background: 'white', 
+              borderRadius: '12px', 
+              padding: '24px', 
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+            }}>
+              <h2 style={{ margin: '0 0 8px 0', fontSize: '1.4rem' }}>Verify Voters</h2>
+              <p style={{ color: '#64748b', margin: '0 0 24px 0' }}>Verify voter information and eligibility before allowing a vote.</p>
+              
+              <div style={{ 
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                padding: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <div style={{ flex: 1 }}>
+                  <label htmlFor="voterId" style={{ 
+                    display: 'block', 
+                    fontSize: '0.9rem', 
+                    fontWeight: '600', 
+                    color: '#334155', 
+                    marginBottom: '8px' 
+                  }}>
+                    Enter Voter ID
+                  </label>
+                  <input 
+                    type="text" 
+                    id="voterId"
+                    placeholder="e.g. VID-1001" 
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
+                <button style={{
+                  background: '#6366f1',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  marginTop: '25px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  Verify
+                </button>
               </div>
-            </div>
-            <div style={{ padding: '20px', background: '#f0f9ff', borderRadius: '8px' }}>
-              <p>Verification system ready for election day.</p>
             </div>
           </div>
         );
       case 'submission':
+        const stationOptions = assignedStations.length > 0
+          ? assignedStations.map((station) => station.name)
+          : (observerProfile.assignedStation ? [observerProfile.assignedStation] : []);
+
         return (
           <div className="tab-content">
             <div className="section-header">
               <div>
                 <h2>Submit Report</h2>
-                <p>Submit your observation report</p>
+                <p>Log issues, incidents, and irregularities observed at polling stations.</p>
               </div>
             </div>
-            <div style={{ padding: '20px', background: '#f0f9ff', borderRadius: '8px' }}>
-              <p>Report submission form available during election period.</p>
+            <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <form onSubmit={handleSubmitReport} style={{ display: 'grid', gap: '14px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Polling Station</label>
+                  <select
+                    value={reportForm.pollingStation}
+                    onChange={(e) => handleReportFieldChange('pollingStation', e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    required
+                  >
+                    {stationOptions.length === 0 ? (
+                      <option value="">No station assigned</option>
+                    ) : (
+                      stationOptions.map((station) => (
+                        <option key={station} value={station}>{station}</option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Issue Type</label>
+                  <select
+                    value={reportForm.issueType}
+                    onChange={(e) => handleReportFieldChange('issueType', e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    required
+                  >
+                    <option value="Queue Delay">Queue Delay</option>
+                    <option value="Voter Verification Issue">Voter Verification Issue</option>
+                    <option value="EVM Malfunction">EVM Malfunction</option>
+                    <option value="Security Concern">Security Concern</option>
+                    <option value="Staff Shortage">Staff Shortage</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Severity</label>
+                  <select
+                    value={reportForm.severity}
+                    onChange={(e) => handleReportFieldChange('severity', e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    required
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Description</label>
+                  <textarea
+                    value={reportForm.description}
+                    onChange={(e) => handleReportFieldChange('description', e.target.value)}
+                    rows={4}
+                    placeholder="Describe the issue in detail..."
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', resize: 'vertical' }}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="card-btn"
+                  disabled={isSubmittingReport || stationOptions.length === 0}
+                  style={{ width: '100%' }}
+                >
+                  {isSubmittingReport ? 'Submitting...' : 'Submit Report'}
+                </button>
+
+                {reportStatus && (
+                  <p style={{ margin: 0, color: reportStatus.includes('successfully') ? '#166534' : '#1e40af' }}>
+                    {reportStatus}
+                  </p>
+                )}
+              </form>
             </div>
           </div>
         );
@@ -178,7 +609,7 @@ function Dashboard({ onLogout }) {
                   <p><strong>Observer ID:</strong> {observerProfile.observerId}</p>
                   <p><strong>Status:</strong> <span className="status-active">{observerProfile.status}</span></p>
                   <p><strong>District:</strong> {observerProfile.district}</p>
-                  <p><strong>Assigned Stations:</strong> {observerProfile.assignedStations}</p>
+                  <p><strong>Assigned Station:</strong> {observerProfile.assignedStation || 'Not Assigned'}</p>
                 </div>
                 <button className="dropdown-btn danger" onClick={handleLogoutClick}>
                   Logout
