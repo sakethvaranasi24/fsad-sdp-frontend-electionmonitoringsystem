@@ -6,7 +6,6 @@ function CitizenSidebar({ activeTab, onTabChange }) {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
     { id: 'elections', label: 'Elections', icon: '🗳️' },
-    { id: 'register', label: 'Register', icon: '✍️' },
     { id: 'reportIssue', label: 'Report Issue', icon: '🚨' },
     { id: 'viewReports', label: 'My Reports', icon: '📋' },
     { id: 'pollingStations', label: 'Polling Stations', icon: '📍' }

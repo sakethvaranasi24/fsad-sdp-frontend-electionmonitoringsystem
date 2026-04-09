@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -33,6 +34,7 @@ function AddDataAnalyst({ onAnalystAdded }) {
     try {
       if (!formData.analystName || !formData.email || !formData.password || !formData.phone) {
         setMessage('❌ Please fill all required fields');
+        toast.error('Please fill all required fields.');
         setLoading(false);
         return;
       }
@@ -48,10 +50,12 @@ function AddDataAnalyst({ onAnalystAdded }) {
       if (!response.ok) {
         const errorText = await response.text();
         setMessage(`❌ ${errorText || 'Error adding analyst'}`);
+        toast.error(errorText || 'Error adding analyst');
         return;
       }
 
       setMessage('✅ Data Analyst added successfully!');
+      toast.success('Data Analyst added successfully.');
       setFormData({
         analystName: '',
         email: '',
@@ -67,6 +71,7 @@ function AddDataAnalyst({ onAnalystAdded }) {
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('❌ Error adding analyst');
+      toast.error('Error adding analyst');
     } finally {
       setLoading(false);
     }

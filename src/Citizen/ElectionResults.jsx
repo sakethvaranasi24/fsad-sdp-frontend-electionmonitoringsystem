@@ -1,7 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-function ElectionResults() {
-  const [selectedState, setSelectedState] = useState('');
+function ElectionResults({ citizenProfile, onRegisterNow }) {
+  const normalizeValue = (value) => (value || '').trim().toLowerCase();
+
+  const profileLocationState = useMemo(() => {
+    return citizenProfile?.state || citizenProfile?.location?.state || '';
+  }, [citizenProfile]);
+
+  const [selectedState, setSelectedState] = useState(profileLocationState);
+
+  useEffect(() => {
+    setSelectedState(profileLocationState);
+  }, [profileLocationState]);
 
   const elections = [
     {
@@ -42,7 +52,7 @@ function ElectionResults() {
   const states = ['All States', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Delhi'];
 
   const filteredElections = selectedState && selectedState !== 'All States'
-    ? elections.filter(e => e.state === selectedState)
+    ? elections.filter(e => normalizeValue(e.state) === normalizeValue(selectedState))
     : elections;
 
   return (
@@ -50,7 +60,7 @@ function ElectionResults() {
       <div className="section-header">
         <div>
           <h2>Available Elections</h2>
-          <p>Track upcoming elections and participation data</p>
+          <p>Track upcoming elections and register directly with your citizen details</p>
         </div>
       </div>
 
@@ -76,7 +86,7 @@ function ElectionResults() {
 
       {filteredElections.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px', color: '#5a6c7d' }}>
-          <p>🗳️ No elections found for selected state</p>
+          <p>🗳️ No elections found for your selected location</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gap: '20px' }}>
@@ -130,8 +140,12 @@ function ElectionResults() {
                 </div>
               </div>
 
-              <button className="citizen-btn primary" style={{ width: '100%', justifyContent: 'center' }}>
-                Learn More
+              <button
+                className="citizen-btn primary"
+                style={{ width: '100%', justifyContent: 'center' }}
+                onClick={() => onRegisterNow?.()}
+              >
+                Register to Vote
               </button>
             </div>
           ))}

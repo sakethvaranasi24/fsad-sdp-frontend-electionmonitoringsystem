@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -33,6 +34,7 @@ function AddObserver({ onObserverAdded }) {
     try {
       if (!formData.observerName || !formData.email || !formData.password || !formData.phone) {
         setMessage('❌ Please fill all required fields');
+        toast.error('Please fill all required fields.');
         setLoading(false);
         return;
       }
@@ -48,10 +50,12 @@ function AddObserver({ onObserverAdded }) {
       if (!response.ok) {
         const errorText = await response.text();
         setMessage(`❌ ${errorText || 'Error adding observer'}`);
+        toast.error(errorText || 'Error adding observer');
         return;
       }
 
       setMessage('✅ Observer added successfully!');
+      toast.success('Observer added successfully.');
       setFormData({
         observerName: '',
         email: '',
@@ -67,6 +71,7 @@ function AddObserver({ onObserverAdded }) {
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('❌ Error adding observer');
+      toast.error('Error adding observer');
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './AdminProfessional.css';
 import AdminSidebar from './AdminSidebar';
 
@@ -18,8 +19,25 @@ import ViewAllAnalysts from './DataAnalyst/ViewAllAnalysts';
 import AssignDistrict from './DataAnalyst/AssignDistrict';
 
 const ADMIN_PROFILE_KEY = 'emsAdminProfile';
+const CURRENT_USER_KEY = 'user';
+const API_URL = import.meta.env.VITE_API_URL;
+
+function getCurrentUserProfile() {
+  const currentUser = localStorage.getItem(CURRENT_USER_KEY);
+  if (!currentUser) {
+    return null;
+  }
+
+  try {
+    const parsedUser = JSON.parse(currentUser);
+    return parsedUser && typeof parsedUser === 'object' ? parsedUser : null;
+  } catch {
+    return null;
+  }
+}
 
 function getAdminProfile() {
+  const currentUserProfile = getCurrentUserProfile();
   const defaultProfile = {
     name: 'System Administrator',
     email: 'admin@system.com',
@@ -38,6 +56,27 @@ function getAdminProfile() {
     twoFactor: 'Enabled'
   };
 
+  if (currentUserProfile) {
+    return {
+      ...defaultProfile,
+      ...currentUserProfile,
+      name: currentUserProfile?.adminName || currentUserProfile?.name || currentUserProfile?.userName || currentUserProfile?.username || defaultProfile.name,
+      email: currentUserProfile?.email || defaultProfile.email,
+      phone: currentUserProfile?.phone || currentUserProfile?.mobile || currentUserProfile?.phoneNumber || defaultProfile.phone,
+      adminId: currentUserProfile?.adminId || currentUserProfile?.id || defaultProfile.adminId,
+      accountStatus: currentUserProfile?.status || currentUserProfile?.accountStatus || defaultProfile.accountStatus,
+      accessLevel: currentUserProfile?.accessLevel || defaultProfile.accessLevel,
+      role: currentUserProfile?.role || defaultProfile.role,
+      lastLogin: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    };
+  }
+
   const storedProfile = localStorage.getItem(ADMIN_PROFILE_KEY);
   if (!storedProfile) {
     return defaultProfile;
@@ -48,9 +87,9 @@ function getAdminProfile() {
     return {
       ...defaultProfile,
       ...parsedProfile,
-      name: parsedProfile?.adminName || parsedProfile?.name || defaultProfile.name,
+      name: parsedProfile?.adminName || parsedProfile?.name || parsedProfile?.userName || parsedProfile?.username || defaultProfile.name,
       email: parsedProfile?.email || defaultProfile.email,
-      phone: parsedProfile?.phone || defaultProfile.phone,
+      phone: parsedProfile?.phone || parsedProfile?.mobile || parsedProfile?.phoneNumber || defaultProfile.phone,
       adminId: parsedProfile?.adminId || parsedProfile?.id || defaultProfile.adminId,
       accountStatus: parsedProfile?.status || parsedProfile?.accountStatus || defaultProfile.accountStatus,
       accessLevel: parsedProfile?.accessLevel || defaultProfile.accessLevel,
@@ -74,7 +113,16 @@ function AdminDashboard({ onLogout }) {
   const [activeSubTab, setActiveSubTab] = useState('view');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [adminProfile] = useState(() => getAdminProfile());
+  const [adminProfile, setAdminProfile] = useState(() => getAdminProfile());
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileDraft, setProfileDraft] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    accessLevel: ''
+  });
+  const [profileStatus, setProfileStatus] = useState('');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const profileDropdownRef = useRef(null);
 
   const adminInitials = adminProfile.name
@@ -87,6 +135,7 @@ function AdminDashboard({ onLogout }) {
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       localStorage.removeItem(ADMIN_PROFILE_KEY);
+      toast.success('Admin logged out successfully.');
       onLogout();
       navigate('/');
     }
@@ -94,6 +143,184 @@ function AdminDashboard({ onLogout }) {
 
   const handleRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  useEffect(() => {
+    const fetchLatestAdminProfile = async () => {
+      const email = adminProfile.email;
+      if (!email || email === 'admin@system.com') {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/adminapi/profile?email=${encodeURIComponent(email)}`);
+        if (!response.ok) {
+          return;
+        }
+
+        const latestData = await response.json().catch(() => null);
+        if (!latestData || typeof latestData !== 'object') {
+          return;
+        }
+
+        const responseObject = latestData?.response && typeof latestData.response === 'object'
+          ? latestData.response
+          : latestData;
+
+        const updatedProfile = {
+          ...adminProfile,
+          ...responseObject,
+          name: responseObject?.adminName || responseObject?.name || responseObject?.userName || responseObject?.username || adminProfile.name,
+          email: responseObject?.email || adminProfile.email,
+          phone: responseObject?.phone || responseObject?.mobile || responseObject?.phoneNumber || adminProfile.phone,
+          adminId: responseObject?.adminId || responseObject?.id || adminProfile.adminId,
+          accessLevel: responseObject?.accessLevel || adminProfile.accessLevel,
+          accountStatus: responseObject?.status || responseObject?.accountStatus || adminProfile.accountStatus,
+          role: responseObject?.role || adminProfile.role,
+          lastLogin: new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        };
+
+        setAdminProfile(updatedProfile);
+        localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(responseObject));
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(responseObject));
+      } catch {
+        // Silent fallback to cached profile
+      }
+    };
+
+    fetchLatestAdminProfile();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleStartEditProfile = () => {
+    setProfileDraft({
+      name: adminProfile.name || '',
+      email: adminProfile.email || '',
+      phone: adminProfile.phone || '',
+      accessLevel: adminProfile.accessLevel || ''
+    });
+    setProfileStatus('');
+    setIsEditingProfile(true);
+  };
+
+  const handleCancelEditProfile = () => {
+    setIsEditingProfile(false);
+    setProfileStatus('');
+  };
+
+  const handleProfileFieldChange = (field, value) => {
+    setProfileDraft((prev) => ({
+      ...prev,
+      [field]: value
+    }));
+    if (profileStatus) {
+      setProfileStatus('');
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    const trimmedName = profileDraft.name.trim();
+    const trimmedEmail = profileDraft.email.trim().toLowerCase();
+    const trimmedPhone = profileDraft.phone.trim();
+    const trimmedAccessLevel = profileDraft.accessLevel.trim();
+
+    if (!trimmedName || !trimmedEmail) {
+      setProfileStatus('Name and email are required.');
+      return;
+    }
+
+    const updatePayload = {
+      id: adminProfile.adminId,
+      adminId: adminProfile.adminId,
+      name: trimmedName,
+      adminName: trimmedName,
+      email: trimmedEmail,
+      phone: trimmedPhone,
+      accessLevel: trimmedAccessLevel || adminProfile.accessLevel,
+      role: adminProfile.role || 'ADMIN',
+      status: adminProfile.accountStatus || 'Active'
+    };
+
+    const candidateRequests = [
+      { url: `${API_URL}/adminapi/profile/update`, method: 'PUT' },
+      { url: `${API_URL}/adminapi/profile/update`, method: 'PATCH' },
+      { url: `${API_URL}/adminapi/update-profile`, method: 'PUT' },
+      { url: `${API_URL}/adminapi/update`, method: 'PUT' }
+    ];
+
+    setIsSavingProfile(true);
+    setProfileStatus('Saving profile...');
+
+    try {
+      let savedResponse = null;
+
+      for (const request of candidateRequests) {
+        try {
+          const response = await fetch(request.url, {
+            method: request.method,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatePayload)
+          });
+
+          if (!response.ok) {
+            continue;
+          }
+
+          savedResponse = await response.json().catch(() => null);
+          break;
+        } catch {
+          // Try next candidate endpoint
+        }
+      }
+
+      if (!savedResponse) {
+        setProfileStatus('Unable to update database profile. Check backend update endpoint configuration.');
+        return;
+      }
+
+      const responseObject = savedResponse?.response && typeof savedResponse.response === 'object'
+        ? savedResponse.response
+        : savedResponse;
+
+      const updatedProfile = {
+        ...adminProfile,
+        ...updatePayload,
+        ...(responseObject && typeof responseObject === 'object' ? responseObject : {}),
+        name: responseObject?.adminName || responseObject?.name || updatePayload.name,
+        email: responseObject?.email || updatePayload.email,
+        phone: responseObject?.phone || updatePayload.phone,
+        accessLevel: responseObject?.accessLevel || updatePayload.accessLevel,
+        adminId: responseObject?.adminId || responseObject?.id || updatePayload.adminId,
+        accountStatus: responseObject?.status || responseObject?.accountStatus || adminProfile.accountStatus,
+        role: responseObject?.role || adminProfile.role,
+        lastLogin: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      };
+
+      setAdminProfile(updatedProfile);
+      localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(updatedProfile));
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedProfile));
+      setProfileStatus('Profile updated and saved to database.');
+      toast.success('Profile updated successfully.');
+      setIsEditingProfile(false);
+    } catch {
+      setProfileStatus('Failed to save profile. Please try again.');
+      toast.error('Failed to save profile. Please try again.');
+    } finally {
+      setIsSavingProfile(false);
+    }
   };
 
   useEffect(() => {
@@ -134,14 +361,83 @@ function AdminDashboard({ onLogout }) {
               <div className="profile-dropdown">
                 <div className="profile-info-card">
                   <h4>Profile Information</h4>
-                  <p><strong>Name:</strong> {adminProfile.name}</p>
-                  <p><strong>Email:</strong> {adminProfile.email}</p>
-                  <p><strong>Phone:</strong> {adminProfile.phone}</p>
-                  <p><strong>Admin ID:</strong> {adminProfile.adminId}</p>
-                  <p><strong>Access Level:</strong> {adminProfile.accessLevel}</p>
-                  <p><strong>Last Login:</strong> {adminProfile.lastLogin}</p>
-                  <p><strong>Status:</strong> <span className="status-active">{adminProfile.accountStatus}</span></p>
+                  {isEditingProfile ? (
+                    <div className="profile-edit-form">
+                      <label className="profile-edit-label" htmlFor="adminEditName">Name</label>
+                      <input
+                        id="adminEditName"
+                        className="profile-edit-input"
+                        type="text"
+                        value={profileDraft.name}
+                        onChange={(e) => handleProfileFieldChange('name', e.target.value)}
+                      />
+
+                      <label className="profile-edit-label" htmlFor="adminEditEmail">Email</label>
+                      <input
+                        id="adminEditEmail"
+                        className="profile-edit-input"
+                        type="email"
+                        value={profileDraft.email}
+                        onChange={(e) => handleProfileFieldChange('email', e.target.value)}
+                      />
+
+                      <label className="profile-edit-label" htmlFor="adminEditPhone">Phone</label>
+                      <input
+                        id="adminEditPhone"
+                        className="profile-edit-input"
+                        type="text"
+                        value={profileDraft.phone}
+                        onChange={(e) => handleProfileFieldChange('phone', e.target.value)}
+                      />
+
+                      <label className="profile-edit-label" htmlFor="adminEditAccess">Access Level</label>
+                      <input
+                        id="adminEditAccess"
+                        className="profile-edit-input"
+                        type="text"
+                        value={profileDraft.accessLevel}
+                        onChange={(e) => handleProfileFieldChange('accessLevel', e.target.value)}
+                      />
+
+                      {profileStatus && <p className="profile-status-text">{profileStatus}</p>}
+
+                      <div className="profile-edit-actions">
+                        <button
+                          className="dropdown-btn"
+                          type="button"
+                          disabled={isSavingProfile}
+                          onClick={handleSaveProfile}
+                        >
+                          {isSavingProfile ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        <button
+                          className="dropdown-btn"
+                          type="button"
+                          disabled={isSavingProfile}
+                          onClick={handleCancelEditProfile}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p><strong>Name:</strong> {adminProfile.name}</p>
+                      <p><strong>Email:</strong> {adminProfile.email}</p>
+                      <p><strong>Phone:</strong> {adminProfile.phone}</p>
+                      <p><strong>Admin ID:</strong> {adminProfile.adminId}</p>
+                      <p><strong>Access Level:</strong> {adminProfile.accessLevel}</p>
+                      <p><strong>Last Login:</strong> {adminProfile.lastLogin}</p>
+                      <p><strong>Status:</strong> <span className="status-active">{adminProfile.accountStatus}</span></p>
+                      {profileStatus && <p className="profile-status-text">{profileStatus}</p>}
+                    </>
+                  )}
                 </div>
+                {!isEditingProfile && (
+                  <button className="dropdown-btn" onClick={handleStartEditProfile}>
+                    Edit Profile
+                  </button>
+                )}
                 <button className="dropdown-btn danger" onClick={handleLogout}>
                   Logout
                 </button>

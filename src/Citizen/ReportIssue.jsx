@@ -1,4 +1,14 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+function getCitizenApiBaseUrl() {
+  if (!API_URL) {
+    return '';
+  }
+  return `${API_URL.replace(/\/$/, '')}/citizenapi`;
+}
 
 function ReportIssue() {
   const [issueType, setIssueType] = useState('');
@@ -7,10 +17,9 @@ function ReportIssue() {
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [submittedComplaints, setSubmittedComplaints] = useState(() => {
-    return JSON.parse(localStorage.getItem('citizenComplaints') || '[]');
-  });
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -24,39 +33,67 @@ function ReportIssue() {
     }
   };
 
-  const handleSubmitIssue = (e) => {
+  const handleSubmitIssue = async (e) => {
     e.preventDefault();
+    setSubmitError('');
+    setMessage('');
 
     if (!issueType || !pollingStation || !severity || !description.trim()) {
-      alert('Please fill all required fields');
+      setSubmitError('Please fill all required fields.');
+      toast.error('Please fill all required fields.');
       return;
     }
 
-    const newComplaint = {
-      id: Date.now(),
-      type: issueType,
-      station: pollingStation,
+    const citizenApiBaseUrl = getCitizenApiBaseUrl();
+    if (!citizenApiBaseUrl) {
+      setSubmitError('API URL is not configured. Set VITE_API_URL in your environment.');
+      toast.error('API URL is not configured.');
+      return;
+    }
+
+    const payload = {
+      issueType,
+      pollingStation,
       severity,
       description,
-      image: imagePreview,
-      submittedDate: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString(),
-      status: 'Under Review'
+      evidence: image?.name || ''
     };
 
-    const updatedComplaints = [...submittedComplaints, newComplaint];
-    setSubmittedComplaints(updatedComplaints);
-    localStorage.setItem('citizenComplaints', JSON.stringify(updatedComplaints));
+    try {
+      setIsSubmitting(true);
 
-    setMessage('Issue reported successfully! Thank you for your contribution.');
-    setIssueType('');
-    setPollingStation('');
-    setSeverity('');
-    setDescription('');
-    setImage(null);
-    setImagePreview(null);
+      const response = await fetch(`${citizenApiBaseUrl}/report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
-    setTimeout(() => setMessage(''), 3000);
+      if (!response.ok) {
+        const errorText = await response.text();
+        setSubmitError(errorText || 'Failed to submit issue report.');
+        toast.error(errorText || 'Failed to submit issue report.');
+        return;
+      }
+
+      setMessage('Issue reported successfully! Thank you for your contribution.');
+      toast.success('Issue reported successfully.');
+      setIssueType('');
+      setPollingStation('');
+      setSeverity('');
+      setDescription('');
+      setImage(null);
+      setImagePreview(null);
+
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      console.error('Issue submission error:', error);
+      setSubmitError('Unable to connect to backend. Please try again.');
+      toast.error('Unable to connect to backend. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -69,6 +106,7 @@ function ReportIssue() {
       </div>
 
       {message && <div className="form-success"><p>{message}</p></div>}
+      {submitError && <p className="form-error">{submitError}</p>}
 
       <form onSubmit={handleSubmitIssue} className="citizen-form">
         <div className="form-row">
@@ -144,8 +182,8 @@ function ReportIssue() {
           )}
         </div>
 
-        <button type="submit" className="citizen-btn primary" style={{ marginTop: '24px' }}>
-          Submit Report
+        <button type="submit" className="citizen-btn primary" style={{ marginTop: '24px' }} disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit Report'}
         </button>
       </form>
     </div>

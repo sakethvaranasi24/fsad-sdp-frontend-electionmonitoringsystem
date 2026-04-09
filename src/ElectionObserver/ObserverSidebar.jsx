@@ -6,8 +6,7 @@ function ObserverSidebar({ activeTab, onTabChange }) {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'assigned', label: 'Assigned Stations', icon: '📍' },
-    { id: 'verify', label: 'Verify Voters', icon: '✓' },
-    { id: 'submission', label: 'Submit Report', icon: '📝' }
+    { id: 'verify', label: 'Verify Voters', icon: '✓' }
   ];
 
   const handleTabClick = (tabId) => {

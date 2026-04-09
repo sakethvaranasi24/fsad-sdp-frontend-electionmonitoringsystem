@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './DataAnalystProfessional.css';
 import AnalystSidebar from './AnalystSidebar';
 
@@ -62,6 +63,7 @@ function Dashboard({ onLogout }) {
   const handleLogoutClick = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       localStorage.removeItem(ANALYST_PROFILE_KEY);
+      toast.success('Data Analyst logged out successfully.');
       onLogout();
       navigate('/');
     }

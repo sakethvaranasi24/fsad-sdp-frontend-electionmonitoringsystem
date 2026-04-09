@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './ElectionObserverProfessional.css';
 import ObserverSidebar from './ObserverSidebar';
 
@@ -115,6 +116,7 @@ function Dashboard({ onLogout }) {
   const handleLogoutClick = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       localStorage.removeItem(OBSERVER_PROFILE_KEY);
+      toast.success('Election Observer logged out successfully.');
       onLogout();
       navigate('/');
     }
@@ -425,101 +427,6 @@ function Dashboard({ onLogout }) {
             </div>
           </div>
         );
-      case 'submission':
-        const stationOptions = assignedStations.length > 0
-          ? assignedStations.map((station) => station.name)
-          : (observerProfile.assignedStation ? [observerProfile.assignedStation] : []);
-
-        return (
-          <div className="tab-content">
-            <div className="section-header">
-              <div>
-                <h2>Submit Report</h2>
-                <p>Log issues, incidents, and irregularities observed at polling stations.</p>
-              </div>
-            </div>
-            <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-              <form onSubmit={handleSubmitReport} style={{ display: 'grid', gap: '14px' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Polling Station</label>
-                  <select
-                    value={reportForm.pollingStation}
-                    onChange={(e) => handleReportFieldChange('pollingStation', e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                    required
-                  >
-                    {stationOptions.length === 0 ? (
-                      <option value="">No station assigned</option>
-                    ) : (
-                      stationOptions.map((station) => (
-                        <option key={station} value={station}>{station}</option>
-                      ))
-                    )}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Issue Type</label>
-                  <select
-                    value={reportForm.issueType}
-                    onChange={(e) => handleReportFieldChange('issueType', e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                    required
-                  >
-                    <option value="Queue Delay">Queue Delay</option>
-                    <option value="Voter Verification Issue">Voter Verification Issue</option>
-                    <option value="EVM Malfunction">EVM Malfunction</option>
-                    <option value="Security Concern">Security Concern</option>
-                    <option value="Staff Shortage">Staff Shortage</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Severity</label>
-                  <select
-                    value={reportForm.severity}
-                    onChange={(e) => handleReportFieldChange('severity', e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                    required
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Critical">Critical</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Description</label>
-                  <textarea
-                    value={reportForm.description}
-                    onChange={(e) => handleReportFieldChange('description', e.target.value)}
-                    rows={4}
-                    placeholder="Describe the issue in detail..."
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', resize: 'vertical' }}
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="card-btn"
-                  disabled={isSubmittingReport || stationOptions.length === 0}
-                  style={{ width: '100%' }}
-                >
-                  {isSubmittingReport ? 'Submitting...' : 'Submit Report'}
-                </button>
-
-                {reportStatus && (
-                  <p style={{ margin: 0, color: reportStatus.includes('successfully') ? '#166534' : '#1e40af' }}>
-                    {reportStatus}
-                  </p>
-                )}
-              </form>
-            </div>
-          </div>
-        );
       case 'monitoring':
         return (
           <div className="tab-content">
@@ -541,7 +448,7 @@ function Dashboard({ onLogout }) {
             <div className="section-header">
               <div>
                 <h2>Dashboard Overview</h2>
-                <p>Welcome to the Observer Panel. Monitor elections and submit reports.</p>
+                <p>Welcome to the Observer Panel. Monitor elections and verify voter details.</p>
               </div>
             </div>
             <div className="dashboard-grid">
@@ -559,14 +466,6 @@ function Dashboard({ onLogout }) {
                 <p>Verify voter information and eligibility</p>
                 <button className="card-btn" onClick={() => setActiveTab('verify')}>
                   Verify
-                </button>
-              </div>
-              <div className="dashboard-card">
-                <div className="card-icon">📝</div>
-                <h3>Submit Report</h3>
-                <p>Submit your observation report</p>
-                <button className="card-btn" onClick={() => setActiveTab('submission')}>
-                  Submit
                 </button>
               </div>
               <div className="dashboard-card">

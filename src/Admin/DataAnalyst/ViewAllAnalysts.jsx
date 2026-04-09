@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -58,12 +59,14 @@ function ViewAllAnalysts() {
         });
 
         if (!response.ok) {
+          toast.error('Failed to delete analyst.');
           return;
         }
 
         setAnalysts(prev => prev.filter(a => (a.id || a.analystId) !== id));
+        toast.success('Analyst deleted successfully.');
       } catch {
-        // no-op
+        toast.error('Unable to delete analyst.');
       }
     }
   };

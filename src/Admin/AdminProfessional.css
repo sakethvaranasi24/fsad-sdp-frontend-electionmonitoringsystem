@@ -201,6 +201,53 @@ body, html {
   font-weight: 600;
 }
 
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-edit-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profile-edit-input {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: #fff;
+}
+
+.profile-edit-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.profile-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.profile-edit-actions .dropdown-btn {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.profile-status-text {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  line-height: 1.35;
+}
+
 .status-active {
   display: inline-block;
   background: var(--success-color);

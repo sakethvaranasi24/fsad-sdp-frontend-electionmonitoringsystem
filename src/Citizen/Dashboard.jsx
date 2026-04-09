@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './CitizenProfessional.css';
 import CitizenSidebar from './CitizenSidebar';
 
@@ -11,8 +12,24 @@ import PollingStations from './PollingStations';
 import ElectionResults from './ElectionResults';
 
 const CITIZEN_PROFILE_KEY = 'emsCitizenProfile';
+const CURRENT_USER_KEY = 'user';
+
+function getCurrentUserProfile() {
+  const currentUser = localStorage.getItem(CURRENT_USER_KEY);
+  if (!currentUser) {
+    return null;
+  }
+
+  try {
+    const parsedUser = JSON.parse(currentUser);
+    return parsedUser && typeof parsedUser === 'object' ? parsedUser : null;
+  } catch {
+    return null;
+  }
+}
 
 function getCitizenProfile() {
+  const currentUserProfile = getCurrentUserProfile();
   const defaultProfile = {
     name: 'John Citizen',
     email: 'john.citizen@email.com',
@@ -24,6 +41,28 @@ function getCitizenProfile() {
     state: ''
   };
 
+  const mapEmail = (profile) => {
+    if (!profile || typeof profile !== 'object') return '';
+    return profile.email
+      || profile.mail
+      || profile.mailId
+      || profile.userEmail
+      || profile.emailId
+      || (profile.username && profile.username.includes('@') ? profile.username : '')
+      || (profile.userName && profile.userName.includes('@') ? profile.userName : '')
+      || '';
+  };
+
+  if (currentUserProfile) {
+    return {
+      ...defaultProfile,
+      ...currentUserProfile,
+      name: currentUserProfile?.citizenName || currentUserProfile?.name || currentUserProfile?.userName || currentUserProfile?.username || defaultProfile.name,
+      email: mapEmail(currentUserProfile) || defaultProfile.email,
+      phone: currentUserProfile?.phone || currentUserProfile?.mobile || currentUserProfile?.phoneNumber || defaultProfile.phone
+    };
+  }
+
   const storedProfile = localStorage.getItem(CITIZEN_PROFILE_KEY);
   if (!storedProfile) {
     return defaultProfile;
@@ -34,7 +73,9 @@ function getCitizenProfile() {
     return {
       ...defaultProfile,
       ...parsedProfile,
-      name: parsedProfile?.citizenName || parsedProfile?.name || defaultProfile.name
+      name: parsedProfile?.citizenName || parsedProfile?.name || parsedProfile?.userName || parsedProfile?.username || defaultProfile.name,
+      email: mapEmail(parsedProfile) || defaultProfile.email,
+      phone: parsedProfile?.phone || parsedProfile?.mobile || parsedProfile?.phoneNumber || defaultProfile.phone
     };
   } catch {
     return defaultProfile;
@@ -47,7 +88,7 @@ function Dashboard({ onLogout }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const [citizenProfile, setCitizenProfile] = useState(() => getCitizenProfile());
-  const [locationForm, setLocationForm] = useState({ state: '', district: '' });
+  const [locationForm, setLocationForm] = useState({ state: '', district: '', email: '' });
 
   const citizenInitials = citizenProfile.name
     .split(' ')
@@ -57,20 +98,23 @@ function Dashboard({ onLogout }) {
 
   const handleLogoutClick = () => {
     if (window.confirm('Are you sure you want to logout?')) {
+      toast.success('Citizen logged out successfully.');
       onLogout();
       navigate('/');
     }
   };
 
-  const handleLocationSave = () => {
+  const handleProfileSave = () => {
     const updatedProfile = {
       ...citizenProfile,
+      email: locationForm.email.trim(),
       state: locationForm.state.trim(),
       district: locationForm.district.trim()
     };
 
     setCitizenProfile(updatedProfile);
     localStorage.setItem(CITIZEN_PROFILE_KEY, JSON.stringify(updatedProfile));
+    toast.success('Profile details updated successfully.');
   };
 
   // Profile dropdown click outside handler
@@ -89,6 +133,7 @@ function Dashboard({ onLogout }) {
 
   useEffect(() => {
     setLocationForm({
+      email: citizenProfile.email || '',
       state: citizenProfile.state || '',
       district: citizenProfile.district || ''
     });
@@ -97,9 +142,14 @@ function Dashboard({ onLogout }) {
   const renderContent = () => {
     switch(activeTab) {
       case 'elections':
-        return <ElectionResults />;
+        return (
+          <ElectionResults
+            citizenProfile={citizenProfile}
+            onRegisterNow={() => setActiveTab('register')}
+          />
+        );
       case 'register':
-        return <Register />;
+        return <Register citizenProfile={citizenProfile} />;
       case 'reportIssue':
         return <ReportIssue />;
       case 'viewReports':
@@ -182,13 +232,23 @@ function Dashboard({ onLogout }) {
                 <div className="profile-info-card">
                   <h4>Profile Information</h4>
                   <p><strong>Name:</strong> {citizenProfile.name}</p>
-                  <p><strong>Email:</strong> {citizenProfile.email}</p>
+                  <p><strong>Email:</strong> {citizenProfile.email || 'Not Available'}</p>
                   <p><strong>Phone:</strong> {citizenProfile.phone}</p>
                   <p><strong>Voter ID:</strong> {citizenProfile.voterId}</p>
                   <p><strong>Status:</strong> <span className="status-active">{citizenProfile.status}</span></p>
                   <p><strong>State:</strong> {citizenProfile.state || 'Not Set'}</p>
                   <p><strong>District:</strong> {citizenProfile.district || 'Not Set'}</p>
                   <p><strong>Registered:</strong> {citizenProfile.registrationDate}</p>
+                  <div className="form-group" style={{ marginTop: '12px' }}>
+                    <label htmlFor="citizen-email">Email</label>
+                    <input
+                      id="citizen-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={locationForm.email}
+                      onChange={(e) => setLocationForm((prev) => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
                   <div className="form-group" style={{ marginTop: '12px' }}>
                     <label htmlFor="citizen-state">State</label>
                     <input
@@ -213,9 +273,9 @@ function Dashboard({ onLogout }) {
                     type="button"
                     className="card-btn"
                     style={{ width: '100%', marginTop: '8px' }}
-                    onClick={handleLocationSave}
+                    onClick={handleProfileSave}
                   >
-                    Save Location
+                    Save Details
                   </button>
                 </div>
                 <button className="dropdown-btn danger" onClick={handleLogoutClick}>

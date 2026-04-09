@@ -300,6 +300,22 @@ body {
   color: var(--primary-color);
 }
 
+.profile-info-card .form-group {
+  margin-bottom: 12px;
+}
+
+.profile-info-card .form-group label {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.profile-info-card .form-group input {
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  border-width: 1.5px;
+  border-radius: 6px;
+}
+
 .status-active {
   background: var(--success-color);
   color: white;

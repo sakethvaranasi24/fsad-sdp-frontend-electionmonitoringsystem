@@ -9,6 +9,8 @@ import AdminLogin from './pages/AdminLogin'
 import CitizenLogin from './pages/CitizenLogin'
 import DataAnalystLogin from './pages/DataAnalystLogin'
 import ElectionObserverLogin from './pages/ElectionObserverLogin'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import './App.css'
 
 const CURRENT_USER_KEY = 'user'
@@ -62,6 +64,15 @@ function App() {
 
   return (
     <Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<RoleSelection />} />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -60,12 +61,14 @@ function ViewPollingStations() {
         });
 
         if (!response.ok) {
+          toast.error('Failed to delete polling station.');
           return;
         }
 
         setStations(prev => prev.filter(s => (s.id || s.stationId) !== id));
+        toast.success('Polling station deleted successfully.');
       } catch {
-        // no-op
+        toast.error('Unable to delete polling station.');
       }
     }
   };

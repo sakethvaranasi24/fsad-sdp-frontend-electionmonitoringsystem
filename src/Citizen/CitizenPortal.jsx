@@ -19,7 +19,6 @@ function CitizenPortal({ onLogout }) {
     district: '',
     state: '',
     pin: '',
-    constituency: '',
     declaration: false
   });
   const [activeTab, setActiveTab] = useState('elections');
@@ -794,7 +793,6 @@ function CitizenPortal({ onLogout }) {
     if (!registerForm.district) errors.district = 'District is required.';
     if (!registerForm.state) errors.state = 'State is required.';
     if (!/^\d{6}$/.test(registerForm.pin)) errors.pin = 'PIN code must be 6 digits.';
-    if (!registerForm.constituency) errors.constituency = 'Constituency is required.';
     if (!registerForm.declaration) {
       errors.declaration = 'You must confirm the declaration.';
     }
@@ -1266,21 +1264,6 @@ function CitizenPortal({ onLogout }) {
                               onChange={(e) => handleRegisterChange('pin', e.target.value.replace(/\D/g, '').slice(0, 6))}
                             />
                             {registerErrors.pin && <span className="field-error">{registerErrors.pin}</span>}
-                          </div>
-                          <div className="form-field">
-                            <label htmlFor="regConstituency">Constituency *</label>
-                            <select
-                              id="regConstituency"
-                              value={registerForm.constituency}
-                              onChange={(e) => handleRegisterChange('constituency', e.target.value)}
-                            >
-                              <option value="">-- Select --</option>
-                              <option value="urban-north">Urban North</option>
-                              <option value="urban-south">Urban South</option>
-                              <option value="rural-east">Rural East</option>
-                              <option value="rural-west">Rural West</option>
-                            </select>
-                            {registerErrors.constituency && <span className="field-error">{registerErrors.constituency}</span>}
                           </div>
                         </div>
                       </div>

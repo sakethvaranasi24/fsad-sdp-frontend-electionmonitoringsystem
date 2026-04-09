@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -33,6 +34,7 @@ function AddPollingStation({ onStationAdded }) {
       // Validate required fields
       if (!formData.stationName || !formData.location || !formData.district) {
         setMessage('❌ Please fill all required fields');
+        toast.error('Please fill all required fields.');
         setLoading(false);
         return;
       }
@@ -46,10 +48,12 @@ function AddPollingStation({ onStationAdded }) {
       if (!response.ok) {
         const errorText = await response.text();
         setMessage(`❌ ${errorText || 'Error adding polling station'}`);
+        toast.error(errorText || 'Error adding polling station');
         return;
       }
 
       setMessage('✅ Polling station added successfully!');
+      toast.success('Polling station added successfully.');
       setFormData({
         stationName: '',
         location: '',
@@ -64,6 +68,7 @@ function AddPollingStation({ onStationAdded }) {
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('❌ Error adding polling station');
+      toast.error('Error adding polling station');
     } finally {
       setLoading(false);
     }

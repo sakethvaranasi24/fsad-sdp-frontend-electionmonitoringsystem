@@ -1,28 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-function Register() {
-  const [formData, setFormData] = useState({
-    fullName: '',
+function getInitialFormData(citizenProfile) {
+  return {
+    fullName: citizenProfile?.name || citizenProfile?.citizenName || citizenProfile?.userName || '',
     parentName: '',
     dob: '',
     gender: '',
     aadhaar: '',
-    mobile: '',
-    email: '',
+    mobile: citizenProfile?.phone || citizenProfile?.mobile || citizenProfile?.phoneNumber || '',
+    email: citizenProfile?.email || citizenProfile?.mail || citizenProfile?.mailId || citizenProfile?.userEmail || '',
     houseNumber: '',
     street: '',
     city: '',
-    district: '',
-    state: '',
+    district: citizenProfile?.district || '',
+    state: citizenProfile?.state || '',
     pin: '',
-    constituency: '',
     declaration: false
-  });
+  };
+}
+
+function Register({ citizenProfile }) {
+  const [formData, setFormData] = useState(() => getInitialFormData(citizenProfile));
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
   const [voterId, setVoterId] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  useEffect(() => {
+    setFormData(getInitialFormData(citizenProfile));
+  }, [citizenProfile]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -42,7 +49,6 @@ function Register() {
     if (!formData.district) newErrors.district = 'District is required';
     if (!formData.state) newErrors.state = 'State is required';
     if (!/^\d{6}$/.test(formData.pin)) newErrors.pin = 'PIN must be 6 digits';
-    if (!formData.constituency) newErrors.constituency = 'Constituency is required';
     if (!formData.declaration) newErrors.declaration = 'You must accept the declaration';
 
     return newErrors;
@@ -80,23 +86,7 @@ function Register() {
 
       // Reset form after 2 seconds
       setTimeout(() => {
-        setFormData({
-          fullName: '',
-          parentName: '',
-          dob: '',
-          gender: '',
-          aadhaar: '',
-          mobile: '',
-          email: '',
-          houseNumber: '',
-          street: '',
-          city: '',
-          district: '',
-          state: '',
-          pin: '',
-          constituency: '',
-          declaration: false
-        });
+        setFormData(getInitialFormData(citizenProfile));
         setIsSubmitted(false);
         setMessage('');
       }, 3000);
@@ -315,21 +305,6 @@ function Register() {
             />
             {errors.pin && <p className="form-error">{errors.pin}</p>}
           </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="constituency">Constituency *</label>
-          <select
-            id="constituency"
-            name="constituency"
-            value={formData.constituency}
-            onChange={handleChange}
-          >
-            <option value="">Select Constituency</option>
-            <option value="const1">Constituency 1</option>
-            <option value="const2">Constituency 2</option>
-          </select>
-          {errors.constituency && <p className="form-error">{errors.constituency}</p>}
         </div>
 
         <div className="form-group" style={{ marginTop: '20px' }}>

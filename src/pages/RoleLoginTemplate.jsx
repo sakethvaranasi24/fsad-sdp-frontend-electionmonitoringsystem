@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import AuthLayout from './AuthLayout';
 
 const REGISTERED_USERS_KEY = 'emsRegisteredUsers';
@@ -49,6 +50,14 @@ function getRegisteredUsers() {
   } catch {
     return [];
   }
+}
+
+function getRoleLabel(role) {
+  if (role === 'admin') return 'Admin';
+  if (role === 'citizen') return 'Citizen';
+  if (role === 'dataanalysts') return 'Data Analyst';
+  if (role === 'electionobserver') return 'Election Observer';
+  return 'User';
 }
 
 function RoleLoginTemplate({
@@ -152,11 +161,13 @@ function RoleLoginTemplate({
         if (!response.ok) {
           const errorText = await response.text();
           setRegistrationError(errorText || 'Registration failed. Please try again.');
+          toast.error(errorText || 'Registration failed. Please try again.');
           return;
         }
 
         if (autoLoginAfterRegister) {
           onLogin(role);
+          toast.success(`${getRoleLabel(role)} logged in successfully.`);
           navigate(`/${role}`);
           return;
         }
@@ -164,6 +175,7 @@ function RoleLoginTemplate({
         resetRegistrationState();
         setShowRegistration(false);
         setRegistrationSuccess('Registration successful. Login with your registered details.');
+        toast.success('Registration successful. Please login.');
         return;
       }
 
@@ -187,6 +199,7 @@ function RoleLoginTemplate({
 
       if (autoLoginAfterRegister) {
         onLogin(role);
+        toast.success(`${getRoleLabel(role)} logged in successfully.`);
         navigate(`/${role}`);
         return;
       }
@@ -194,9 +207,11 @@ function RoleLoginTemplate({
       resetRegistrationState();
       setShowRegistration(false);
       setRegistrationSuccess('Registration successful. Login with your registered details.');
+      toast.success('Registration successful. Please login.');
     } catch (error) {
       console.error('Registration error:', error);
       setRegistrationError('Registration failed. Please try again.');
+      toast.error('Registration failed. Please try again.');
     }
   };
 
@@ -229,6 +244,7 @@ function RoleLoginTemplate({
         if (!response.ok) {
           const errorText = await response.text();
           setLoginError(errorText || 'Wrong credentials');
+          toast.error(errorText || 'Wrong credentials');
           return;
         }
 
@@ -237,28 +253,62 @@ function RoleLoginTemplate({
           ? loginData.response
           : loginData;
 
-        if (responseObject && typeof responseObject === 'object') {
-          localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(responseObject));
+        const baseResponse = responseObject && typeof responseObject === 'object' ? responseObject : {};
+        const payloadEmail = payload?.email || '';
+        const payloadUsername = payload?.username || '';
+        const responseEmail =
+          baseResponse?.email
+          || baseResponse?.mail
+          || baseResponse?.mailId
+          || baseResponse?.userEmail
+          || baseResponse?.emailId
+          || '';
+        const usernameAsEmail =
+          (baseResponse?.username && baseResponse.username.includes('@') ? baseResponse.username : '')
+          || (baseResponse?.userName && baseResponse.userName.includes('@') ? baseResponse.userName : '')
+          || (payloadUsername && payloadUsername.includes('@') ? payloadUsername : '');
+        const fallbackName = baseResponse?.name
+          || baseResponse?.adminName
+          || baseResponse?.observerName
+          || baseResponse?.analystName
+          || baseResponse?.citizenName
+          || baseResponse?.userName
+          || baseResponse?.username
+          || payloadUsername
+          || (payloadEmail ? payloadEmail.split('@')[0] : '');
 
-          if (role === 'admin') {
-            localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(responseObject));
-          }
+        const mergedUserProfile = {
+          ...baseResponse,
+          role: baseResponse?.role || role,
+          name: fallbackName,
+          userName: baseResponse?.userName || baseResponse?.username || payloadUsername,
+          username: baseResponse?.username || baseResponse?.userName || payloadUsername,
+          email: responseEmail || payloadEmail || usernameAsEmail,
+          aadhaarNumber: baseResponse?.aadhaarNumber || payload?.aadhaarNumber || '',
+          password: payload?.password || ''
+        };
 
-          if (role === 'electionobserver') {
-            localStorage.setItem(OBSERVER_PROFILE_KEY, JSON.stringify(responseObject));
-          }
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(mergedUserProfile));
 
-          if (role === 'dataanalysts') {
-            localStorage.setItem(ANALYST_PROFILE_KEY, JSON.stringify(responseObject));
-          }
-
-          if (role === 'citizen') {
-            localStorage.setItem(CITIZEN_PROFILE_KEY, JSON.stringify(responseObject));
-          }
+        if (role === 'admin') {
+          localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(mergedUserProfile));
         }
 
-        const resolvedRole = normalizeRoleToAppRole(responseObject?.role) || role;
-        onLogin(resolvedRole, responseObject);
+        if (role === 'electionobserver') {
+          localStorage.setItem(OBSERVER_PROFILE_KEY, JSON.stringify(mergedUserProfile));
+        }
+
+        if (role === 'dataanalysts') {
+          localStorage.setItem(ANALYST_PROFILE_KEY, JSON.stringify(mergedUserProfile));
+        }
+
+        if (role === 'citizen') {
+          localStorage.setItem(CITIZEN_PROFILE_KEY, JSON.stringify(mergedUserProfile));
+        }
+
+        const resolvedRole = normalizeRoleToAppRole(mergedUserProfile?.role) || role;
+        onLogin(resolvedRole, mergedUserProfile);
+        toast.success(`${getRoleLabel(resolvedRole)} logged in successfully.`);
         navigate(`/${resolvedRole}`);
         return;
       }
@@ -284,6 +334,7 @@ function RoleLoginTemplate({
 
       if (userFound) {
         onLogin(role);
+        toast.success(`${getRoleLabel(role)} logged in successfully.`);
         navigate(`/${role}`);
         return;
       }
@@ -299,6 +350,7 @@ function RoleLoginTemplate({
 
         if (response.ok) {
           onLogin(role);
+          toast.success(`${getRoleLabel(role)} logged in successfully.`);
           navigate(`/${role}`);
           return;
         }
@@ -307,9 +359,11 @@ function RoleLoginTemplate({
       }
 
       setLoginError('Wrong credentials');
+      toast.error('Wrong credentials');
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.');
     }
   };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -58,12 +59,14 @@ function ViewAllObservers() {
         });
 
         if (!response.ok) {
+          toast.error('Failed to delete observer.');
           return;
         }
 
         setObservers(prev => prev.filter(o => o.email !== email));
+        toast.success('Observer deleted successfully.');
       } catch {
-        // no-op
+        toast.error('Unable to delete observer.');
       }
     }
   };
