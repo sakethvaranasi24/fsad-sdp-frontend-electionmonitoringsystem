@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
@@ -28,15 +29,8 @@ function ViewAllObservers() {
 
   const loadObservers = async () => {
     try {
-      const response = await fetch(`${API_URL}/adminapi/observer/all`);
-
-      if (!response.ok) {
-        setObservers([]);
-        return;
-      }
-
-      const responseData = await response.json().catch(() => []);
-      setObservers(extractList(responseData));
+      const response = await axios.get(`${API_URL}/adminapi/observer/all`);
+      setObservers(extractList(response.data));
     } catch {
       setObservers([]);
     }
@@ -54,19 +48,18 @@ function ViewAllObservers() {
   const deleteObserver = async (email) => {
     if (window.confirm('Are you sure you want to delete this observer?')) {
       try {
-        const response = await fetch(`${API_URL}/adminapi/observer/delete?email=${encodeURIComponent(email)}`, {
-          method: 'DELETE'
+        await axios.delete(`${API_URL}/adminapi/observer/delete`, {
+          params: { email }
         });
-
-        if (!response.ok) {
-          toast.error('Failed to delete observer.');
-          return;
-        }
 
         setObservers(prev => prev.filter(o => o.email !== email));
         toast.success('Observer deleted successfully.');
-      } catch {
-        toast.error('Unable to delete observer.');
+      } catch (error) {
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        toast.error(apiMessage || 'Unable to delete observer.');
       }
     }
   };

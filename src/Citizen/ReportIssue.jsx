@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -62,20 +63,7 @@ function ReportIssue() {
     try {
       setIsSubmitting(true);
 
-      const response = await fetch(`${citizenApiBaseUrl}/report`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        setSubmitError(errorText || 'Failed to submit issue report.');
-        toast.error(errorText || 'Failed to submit issue report.');
-        return;
-      }
+      await axios.post(`${citizenApiBaseUrl}/report`, payload);
 
       setMessage('Issue reported successfully! Thank you for your contribution.');
       toast.success('Issue reported successfully.');
@@ -89,8 +77,12 @@ function ReportIssue() {
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Issue submission error:', error);
-      setSubmitError('Unable to connect to backend. Please try again.');
-      toast.error('Unable to connect to backend. Please try again.');
+      const apiMessage =
+        typeof error?.response?.data === 'string'
+          ? error.response.data
+          : error?.response?.data?.message;
+      setSubmitError(apiMessage || 'Unable to connect to backend. Please try again.');
+      toast.error(apiMessage || 'Unable to connect to backend. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

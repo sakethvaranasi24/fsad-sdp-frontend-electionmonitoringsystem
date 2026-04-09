@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
@@ -39,18 +40,7 @@ function AddPollingStation({ onStationAdded }) {
         return;
       }
 
-      const response = await fetch(`${API_URL}/adminapi/polling-station/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        setMessage(`❌ ${errorText || 'Error adding polling station'}`);
-        toast.error(errorText || 'Error adding polling station');
-        return;
-      }
+      await axios.post(`${API_URL}/adminapi/polling-station/add`, formData);
 
       setMessage('✅ Polling station added successfully!');
       toast.success('Polling station added successfully.');
@@ -67,8 +57,12 @@ function AddPollingStation({ onStationAdded }) {
 
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      setMessage('❌ Error adding polling station');
-      toast.error('Error adding polling station');
+      const apiMessage =
+        typeof error?.response?.data === 'string'
+          ? error.response.data
+          : error?.response?.data?.message;
+      setMessage(`❌ ${apiMessage || 'Error adding polling station'}`);
+      toast.error(apiMessage || 'Error adding polling station');
     } finally {
       setLoading(false);
     }

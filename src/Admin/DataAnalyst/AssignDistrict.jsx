@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -33,14 +34,8 @@ function AssignDistrict() {
 
   const loadAnalysts = async () => {
     try {
-      const response = await fetch(`${API_URL}/adminapi/analyst/all`);
-      if (!response.ok) {
-        setAnalysts([]);
-        return;
-      }
-
-      const responseData = await response.json().catch(() => []);
-      setAnalysts(extractList(responseData));
+      const response = await axios.get(`${API_URL}/adminapi/analyst/all`);
+      setAnalysts(extractList(response.data));
     } catch {
       setAnalysts([]);
     }
@@ -68,8 +63,7 @@ function AssignDistrict() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        setMessage(`❌ ${errorText || 'Failed to assign district'}`);
-        return;
+        throw new Error(errorText || 'Unable to assign district. Please try again.');
       }
 
       setAnalysts((prev) => prev.map((analyst) =>
@@ -80,8 +74,9 @@ function AssignDistrict() {
       setMessage('✅ District assigned successfully!');
       setSelectedAnalyst('');
       setSelectedDistrict('');
-    } catch {
-      setMessage('❌ Unable to assign district. Please try again.');
+    } catch (error) {
+      const apiMessage = error?.message;
+      setMessage(`❌ ${apiMessage || 'Unable to assign district. Please try again.'}`);
     }
     
     setTimeout(() => setMessage(''), 3000);

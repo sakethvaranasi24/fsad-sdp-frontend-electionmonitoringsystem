@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -32,16 +33,12 @@ function AssignObserver() {
   const loadData = async () => {
     try {
       const [observersResponse, stationsResponse] = await Promise.all([
-        fetch(`${API_URL}/adminapi/observer/all`),
-        fetch(`${API_URL}/adminapi/polling-station/all`)
+        axios.get(`${API_URL}/adminapi/observer/all`),
+        axios.get(`${API_URL}/adminapi/polling-station/all`)
       ]);
 
-      const observersData = observersResponse.ok
-        ? await observersResponse.json().catch(() => [])
-        : [];
-      const stationsData = stationsResponse.ok
-        ? await stationsResponse.json().catch(() => [])
-        : [];
+      const observersData = observersResponse.data;
+      const stationsData = stationsResponse.data;
 
       setObservers(extractList(observersData));
       setStations(extractList(stationsData));
@@ -60,22 +57,10 @@ function AssignObserver() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/adminapi/observer/assign-district`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: selectedObserverForDistrict,
-          district: selectedDistrict
-        })
+      await axios.put(`${API_URL}/adminapi/observer/assign-district`, {
+        email: selectedObserverForDistrict,
+        district: selectedDistrict
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        setMessage(`❌ ${errorText || 'Failed to assign district'}`);
-        return;
-      }
 
       const updated = observers.map(obs => 
         obs.email === selectedObserverForDistrict 
@@ -88,8 +73,12 @@ function AssignObserver() {
       setMessage('✅ District assigned successfully!');
       setSelectedObserverForDistrict('');
       setSelectedDistrict('');
-    } catch {
-      setMessage('❌ Unable to assign district. Please try again.');
+    } catch (error) {
+      const apiMessage =
+        typeof error?.response?.data === 'string'
+          ? error.response.data
+          : error?.response?.data?.message;
+      setMessage(`❌ ${apiMessage || 'Unable to assign district. Please try again.'}`);
     }
 
     setTimeout(() => setMessage(''), 3000);
@@ -104,22 +93,10 @@ function AssignObserver() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/adminapi/observer/assign-station`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: selectedObserverForStation,
-          assignedStation: selectedStation
-        })
+      await axios.put(`${API_URL}/adminapi/observer/assign-station`, {
+        email: selectedObserverForStation,
+        assignedStation: selectedStation
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        setMessage(`❌ ${errorText || 'Failed to assign station'}`);
-        return;
-      }
 
       const updated = observers.map(obs =>
         obs.email === selectedObserverForStation
@@ -132,8 +109,12 @@ function AssignObserver() {
       setMessage('✅ Station assigned successfully!');
       setSelectedObserverForStation('');
       setSelectedStation('');
-    } catch {
-      setMessage('❌ Unable to assign station. Please try again.');
+    } catch (error) {
+      const apiMessage =
+        typeof error?.response?.data === 'string'
+          ? error.response.data
+          : error?.response?.data?.message;
+      setMessage(`❌ ${apiMessage || 'Unable to assign station. Please try again.'}`);
     }
 
     setTimeout(() => setMessage(''), 3000);

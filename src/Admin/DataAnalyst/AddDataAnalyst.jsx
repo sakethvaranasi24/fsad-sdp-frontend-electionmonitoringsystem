@@ -1,8 +1,29 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+function extractApiErrorMessage(error, fallbackMessage) {
+  const responseData = error?.response?.data;
+  if (typeof responseData === 'string' && responseData.trim()) {
+    return responseData;
+  }
+  if (typeof responseData?.message === 'string' && responseData.message.trim()) {
+    return responseData.message;
+  }
+  if (typeof responseData?.error === 'string' && responseData.error.trim()) {
+    return responseData.error;
+  }
+  if (typeof responseData?.response === 'string' && responseData.response.trim()) {
+    return responseData.response;
+  }
+  if (typeof error?.message === 'string' && error.message.trim()) {
+    return error.message;
+  }
+  return fallbackMessage;
+}
 
 function AddDataAnalyst({ onAnalystAdded }) {
   const [formData, setFormData] = useState({
@@ -39,19 +60,39 @@ function AddDataAnalyst({ onAnalystAdded }) {
         return;
       }
 
-      const response = await fetch(`${API_URL}/adminapi/analyst/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const payload = {
+        ...formData,
+        name: formData.analystName,
+        district: formData.assignedDistrict
+      };
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        setMessage(`❌ ${errorText || 'Error adding analyst'}`);
-        toast.error(errorText || 'Error adding analyst');
-        return;
+      const addRequests = [
+        () => axios.post(`${API_URL}/adminapi/analyst/add`, payload),
+        () => axios.post(`${API_URL}/adminapi/data-analyst/add`, payload),
+        () => axios.post(`${API_URL}/adminapi/analysts/add`, payload)
+      ];
+
+      let lastError = null;
+      let created = false;
+
+      for (const request of addRequests) {
+        try {
+          await request();
+          created = true;
+          break;
+        } catch (requestError) {
+          lastError = requestError;
+          const status = requestError?.response?.status;
+          // Try next endpoint when route/method is unavailable.
+          if (status === 404 || status === 405) {
+            continue;
+          }
+          throw requestError;
+        }
+      }
+
+      if (!created) {
+        throw lastError || new Error('Unable to add data analyst.');
       }
 
       setMessage('✅ Data Analyst added successfully!');
@@ -70,8 +111,9 @@ function AddDataAnalyst({ onAnalystAdded }) {
 
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      setMessage('❌ Error adding analyst');
-      toast.error('Error adding analyst');
+      const apiMessage = extractApiErrorMessage(error, 'Error adding analyst');
+      setMessage(`❌ ${apiMessage}`);
+      toast.error(apiMessage);
     } finally {
       setLoading(false);
     }

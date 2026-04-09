@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './DataAnalystProfessional.css';
@@ -76,12 +77,10 @@ function Dashboard({ onLogout }) {
       if (!email || email === 'analyst@system.com') return;
 
       try {
-        const response = await fetch(
-          `${API_URL}/analystapi/profile?email=${encodeURIComponent(email)}`
-        );
-        if (!response.ok) return;
-
-        const latestData = await response.json().catch(() => null);
+        const response = await axios.get(`${API_URL}/analystapi/profile`, {
+          params: { email }
+        });
+        const latestData = response.data;
         if (!latestData || typeof latestData !== 'object') return;
 
         const updatedProfile = {
@@ -117,20 +116,17 @@ function Dashboard({ onLogout }) {
       setDistrictError('');
 
       try {
-        const response = await fetch(
-          `${API_URL}/analystapi/polling-stations/my-district?district=${encodeURIComponent(analystProfile.assignedDistrict)}`
-        );
-
-        if (!response.ok) {
-          setDistrictError('Could not load district polling stations.');
-          setDistrictStations([]);
-          return;
-        }
-
-        const data = await response.json().catch(() => []);
+        const response = await axios.get(`${API_URL}/analystapi/polling-stations/my-district`, {
+          params: { district: analystProfile.assignedDistrict }
+        });
+        const data = response.data;
         setDistrictStations(Array.isArray(data) ? data : []);
-      } catch {
-        setDistrictError('Could not load district polling stations.');
+      } catch (error) {
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        setDistrictError(apiMessage || 'Could not load district polling stations.');
         setDistrictStations([]);
       } finally {
         setIsDistrictLoading(false);
@@ -147,18 +143,15 @@ function Dashboard({ onLogout }) {
       setAllError('');
 
       try {
-        const response = await fetch(`${API_URL}/analystapi/polling-stations/all`);
-
-        if (!response.ok) {
-          setAllError('Could not load state polling data.');
-          setAllStations([]);
-          return;
-        }
-
-        const data = await response.json().catch(() => []);
+        const response = await axios.get(`${API_URL}/analystapi/polling-stations/all`);
+        const data = response.data;
         setAllStations(Array.isArray(data) ? data : []);
-      } catch {
-        setAllError('Could not load state polling data.');
+      } catch (error) {
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        setAllError(apiMessage || 'Could not load state polling data.');
         setAllStations([]);
       } finally {
         setIsAllLoading(false);

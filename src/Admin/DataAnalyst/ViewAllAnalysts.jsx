@@ -1,8 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+function extractApiErrorMessage(error, fallbackMessage) {
+  const responseData = error?.response?.data;
+  if (typeof responseData === 'string' && responseData.trim()) {
+    return responseData;
+  }
+  if (typeof responseData?.message === 'string' && responseData.message.trim()) {
+    return responseData.message;
+  }
+  if (typeof responseData?.error === 'string' && responseData.error.trim()) {
+    return responseData.error;
+  }
+  if (typeof responseData?.response === 'string' && responseData.response.trim()) {
+    return responseData.response;
+  }
+  if (typeof error?.message === 'string' && error.message.trim()) {
+    return error.message;
+  }
+  return fallbackMessage;
+}
 
 function extractList(payload) {
   if (Array.isArray(payload)) {
@@ -28,15 +49,8 @@ function ViewAllAnalysts() {
 
   const loadAnalysts = async () => {
     try {
-      const response = await fetch(`${API_URL}/adminapi/analyst/all`);
-
-      if (!response.ok) {
-        setAnalysts([]);
-        return;
-      }
-
-      const responseData = await response.json().catch(() => []);
-      setAnalysts(extractList(responseData));
+      const response = await axios.get(`${API_URL}/adminapi/analyst/all`);
+      setAnalysts(extractList(response.data));
     } catch {
       setAnalysts([]);
     }
@@ -51,22 +65,47 @@ function ViewAllAnalysts() {
     return matchSearch && matchStatus;
   });
 
-  const deleteAnalyst = async (id) => {
+  const deleteAnalyst = async (email) => {
     if (window.confirm('Are you sure you want to delete this analyst?')) {
       try {
-        const response = await fetch(`${API_URL}/adminapi/analyst/delete?id=${encodeURIComponent(id)}`, {
-          method: 'DELETE'
-        });
+        const normalizedEmail = (email || '').trim();
+        const encodedEmail = encodeURIComponent(normalizedEmail);
 
-        if (!response.ok) {
-          toast.error('Failed to delete analyst.');
-          return;
+        const deleteRequests = [
+          () => axios.delete(`${API_URL}/adminapi/analyst/delete`, { params: { email: normalizedEmail } }),
+          () => axios.delete(`${API_URL}/adminapi/analyst/delete`, { data: { email: normalizedEmail } }),
+          () => axios.delete(`${API_URL}/adminapi/analyst/delete/${encodedEmail}`),
+          () => axios.delete(`${API_URL}/adminapi/data-analyst/delete`, { params: { email: normalizedEmail } }),
+          () => axios.delete(`${API_URL}/adminapi/analysts/delete`, { params: { email: normalizedEmail } })
+        ];
+
+        let lastError = null;
+        let deleted = false;
+
+        for (const request of deleteRequests) {
+          try {
+            await request();
+            deleted = true;
+            break;
+          } catch (requestError) {
+            lastError = requestError;
+            const status = requestError?.response?.status;
+            if (status === 404 || status === 405) {
+              continue;
+            }
+            throw requestError;
+          }
         }
 
-        setAnalysts(prev => prev.filter(a => (a.id || a.analystId) !== id));
+        if (!deleted) {
+          throw lastError || new Error('Unable to delete analyst.');
+        }
+
+        setAnalysts(prev => prev.filter(a => (a.email || '').toLowerCase() !== (email || '').toLowerCase()));
         toast.success('Analyst deleted successfully.');
-      } catch {
-        toast.error('Unable to delete analyst.');
+      } catch (error) {
+        const apiMessage = extractApiErrorMessage(error, 'Unable to delete analyst.');
+        toast.error(apiMessage);
       }
     }
   };
@@ -140,7 +179,7 @@ function ViewAllAnalysts() {
                     <button className="admin-btn btn-sm btn-edit">✏️ Edit</button>
                     <button
                       className="admin-btn btn-sm btn-delete"
-                      onClick={() => deleteAnalyst(analyst.id || analyst.analystId)}
+                      onClick={() => deleteAnalyst(analyst.email)}
                     >
                       🗑️ Delete
                     </button>

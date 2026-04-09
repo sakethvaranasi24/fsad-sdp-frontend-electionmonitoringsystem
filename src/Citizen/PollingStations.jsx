@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -43,19 +44,15 @@ function PollingStations({ preferredState = '', preferredDistrict = '' }) {
         const endpoint = selectedDistrict
           ? `${API_URL}/citizenapi/polling-stations/by-district?district=${encodeURIComponent(selectedDistrict)}`
           : `${API_URL}/citizenapi/polling-stations/all`;
-        const response = await fetch(endpoint);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          setFetchError(errorText || 'Unable to load polling stations.');
-          setStations([]);
-          return;
-        }
-
-        const responseData = await response.json().catch(() => []);
+        const response = await axios.get(endpoint);
+        const responseData = response.data;
         setStations(normalizeStations(responseData));
-      } catch {
-        setFetchError('Unable to load polling stations.');
+      } catch (error) {
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        setFetchError(apiMessage || 'Unable to load polling stations.');
         setStations([]);
       } finally {
         setIsLoading(false);

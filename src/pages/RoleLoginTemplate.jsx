@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AuthLayout from './AuthLayout';
@@ -150,20 +151,7 @@ function RoleLoginTemplate({
 
     try {
       if (isBackendRole) {
-        const response = await fetch(registerPath, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          setRegistrationError(errorText || 'Registration failed. Please try again.');
-          toast.error(errorText || 'Registration failed. Please try again.');
-          return;
-        }
+        await axios.post(registerPath, payload);
 
         if (autoLoginAfterRegister) {
           onLogin(role);
@@ -210,8 +198,12 @@ function RoleLoginTemplate({
       toast.success('Registration successful. Please login.');
     } catch (error) {
       console.error('Registration error:', error);
-      setRegistrationError('Registration failed. Please try again.');
-      toast.error('Registration failed. Please try again.');
+      const apiMessage =
+        typeof error?.response?.data === 'string'
+          ? error.response.data
+          : error?.response?.data?.message;
+      setRegistrationError(apiMessage || 'Registration failed. Please try again.');
+      toast.error(apiMessage || 'Registration failed. Please try again.');
     }
   };
 
@@ -233,22 +225,8 @@ function RoleLoginTemplate({
 
     try {
       if (isBackendRole) {
-        const response = await fetch(loginPath, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          setLoginError(errorText || 'Wrong credentials');
-          toast.error(errorText || 'Wrong credentials');
-          return;
-        }
-
-        const loginData = await response.json().catch(() => null);
+        const response = await axios.post(loginPath, payload);
+        const loginData = response.data;
         const responseObject = loginData?.response && typeof loginData.response === 'object'
           ? loginData.response
           : loginData;
@@ -340,20 +318,11 @@ function RoleLoginTemplate({
       }
 
       try {
-        const response = await fetch(loginPath, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (response.ok) {
-          onLogin(role);
-          toast.success(`${getRoleLabel(role)} logged in successfully.`);
-          navigate(`/${role}`);
-          return;
-        }
+        await axios.post(loginPath, payload);
+        onLogin(role);
+        toast.success(`${getRoleLabel(role)} logged in successfully.`);
+        navigate(`/${role}`);
+        return;
       } catch (err) {
         console.error('Backend login failed:', err);
       }
@@ -362,8 +331,12 @@ function RoleLoginTemplate({
       toast.error('Wrong credentials');
     } catch (error) {
       console.error('Login error:', error);
-      setLoginError('An error occurred. Please try again.');
-      toast.error('An error occurred. Please try again.');
+      const apiMessage =
+        typeof error?.response?.data === 'string'
+          ? error.response.data
+          : error?.response?.data?.message;
+      setLoginError(apiMessage || 'An error occurred. Please try again.');
+      toast.error(apiMessage || 'An error occurred. Please try again.');
     }
   };
 

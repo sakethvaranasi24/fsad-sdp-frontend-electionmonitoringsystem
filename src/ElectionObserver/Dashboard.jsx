@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './ElectionObserverProfessional.css';
@@ -129,13 +130,10 @@ function Dashboard({ onLogout }) {
       if (!email || email === 'observer@system.com') return;
 
       try {
-        const response = await fetch(
-          `${API_URL}/observerapi/profile?email=${encodeURIComponent(email)}`
-        );
-
-        if (!response.ok) return;
-
-        const latestData = await response.json().catch(() => null);
+        const response = await axios.get(`${API_URL}/observerapi/profile`, {
+          params: { email }
+        });
+        const latestData = response.data;
         if (!latestData || typeof latestData !== 'object') return;
 
         // Merge backend data into profile and update localStorage
@@ -186,21 +184,17 @@ function Dashboard({ onLogout }) {
       setStationsError('');
 
       try {
-        const response = await fetch(
-          `${API_URL}/observerapi/my-district-stations?district=${encodeURIComponent(observerProfile.district)}`
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          setStationsError(errorText || 'Unable to load assigned stations.');
-          setAssignedStations([]);
-          return;
-        }
-
-        const responseData = await response.json().catch(() => []);
+        const response = await axios.get(`${API_URL}/observerapi/my-district-stations`, {
+          params: { district: observerProfile.district }
+        });
+        const responseData = response.data;
         setAssignedStations(normalizeStations(responseData));
-      } catch {
-        setStationsError('Unable to load assigned stations.');
+      } catch (error) {
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        setStationsError(apiMessage || 'Unable to load assigned stations.');
         setAssignedStations([]);
       } finally {
         setIsStationsLoading(false);
@@ -257,17 +251,10 @@ function Dashboard({ onLogout }) {
     setReportStatus('');
 
     try {
-      const response = await fetch(`${API_URL}/observerapi/report/submit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
+      try {
+        await axios.post(`${API_URL}/observerapi/report/submit`, payload);
         setReportStatus('Submitted report successfully.');
-      } else {
+      } catch {
         const savedReports = JSON.parse(localStorage.getItem(OBSERVER_REPORTS_KEY) || '[]');
         savedReports.unshift({ ...payload, status: 'queued-locally' });
         localStorage.setItem(OBSERVER_REPORTS_KEY, JSON.stringify(savedReports));

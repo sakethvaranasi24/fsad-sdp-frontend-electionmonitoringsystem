@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './AdminProfessional.css';
@@ -153,12 +154,10 @@ function AdminDashboard({ onLogout }) {
       }
 
       try {
-        const response = await fetch(`${API_URL}/adminapi/profile?email=${encodeURIComponent(email)}`);
-        if (!response.ok) {
-          return;
-        }
-
-        const latestData = await response.json().catch(() => null);
+        const response = await axios.get(`${API_URL}/adminapi/profile`, {
+          params: { email }
+        });
+        const latestData = response.data;
         if (!latestData || typeof latestData !== 'object') {
           return;
         }
@@ -261,19 +260,18 @@ function AdminDashboard({ onLogout }) {
 
       for (const request of candidateRequests) {
         try {
-          const response = await fetch(request.url, {
-            method: request.method,
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatePayload)
+          const response = await axios({
+            url: request.url,
+            method: request.method.toLowerCase(),
+            data: updatePayload,
+            validateStatus: () => true
           });
 
-          if (!response.ok) {
+          if (response.status < 200 || response.status >= 300) {
             continue;
           }
 
-          savedResponse = await response.json().catch(() => null);
+          savedResponse = response.data;
           break;
         } catch {
           // Try next candidate endpoint

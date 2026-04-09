@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
@@ -28,15 +29,8 @@ function ViewPollingStations() {
 
   const loadStations = async () => {
     try {
-      const response = await fetch(`${API_URL}/adminapi/polling-station/all`);
-
-      if (!response.ok) {
-        setStations([]);
-        return;
-      }
-
-      const responseData = await response.json().catch(() => []);
-      setStations(extractList(responseData));
+      const response = await axios.get(`${API_URL}/adminapi/polling-station/all`);
+      setStations(extractList(response.data));
     } catch {
       setStations([]);
     }
@@ -56,19 +50,18 @@ function ViewPollingStations() {
   const deleteStation = async (id) => {
     if (window.confirm('Are you sure you want to delete this station?')) {
       try {
-        const response = await fetch(`${API_URL}/adminapi/polling-station/delete?id=${encodeURIComponent(id)}`, {
-          method: 'DELETE'
+        await axios.delete(`${API_URL}/adminapi/polling-station/delete`, {
+          params: { id }
         });
-
-        if (!response.ok) {
-          toast.error('Failed to delete polling station.');
-          return;
-        }
 
         setStations(prev => prev.filter(s => (s.id || s.stationId) !== id));
         toast.success('Polling station deleted successfully.');
-      } catch {
-        toast.error('Unable to delete polling station.');
+      } catch (error) {
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        toast.error(apiMessage || 'Unable to delete polling station.');
       }
     }
   };

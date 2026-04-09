@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -29,22 +30,17 @@ function ViewReports() {
       try {
         setIsLoading(true);
         setErrorMessage('');
-        const response = await fetch(`${citizenApiBaseUrl}/issues`);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          setErrorMessage(errorText || 'Failed to load reports.');
-          toast.error(errorText || 'Failed to load reports.');
-          setSubmittedComplaints([]);
-          return;
-        }
-
-        const data = await response.json();
+        const response = await axios.get(`${citizenApiBaseUrl}/issues`);
+        const data = response.data;
         setSubmittedComplaints(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Failed to fetch reports:', error);
-        setErrorMessage('Unable to connect to backend. Please try again.');
-        toast.error('Unable to connect to backend. Please try again.');
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        setErrorMessage(apiMessage || 'Unable to connect to backend. Please try again.');
+        toast.error(apiMessage || 'Unable to connect to backend. Please try again.');
         setSubmittedComplaints([]);
       } finally {
         setIsLoading(false);
@@ -64,23 +60,18 @@ function ViewReports() {
       }
 
       try {
-        const response = await fetch(`${citizenApiBaseUrl}/delete/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          setErrorMessage(errorText || 'Failed to delete report.');
-          toast.error(errorText || 'Failed to delete report.');
-          return;
-        }
+        await axios.delete(`${citizenApiBaseUrl}/delete/${id}`);
 
         setSubmittedComplaints((prev) => prev.filter((c) => c.id !== id));
         toast.success('Report deleted successfully.');
       } catch (error) {
         console.error('Failed to delete report:', error);
-        setErrorMessage('Unable to connect to backend. Please try again.');
-        toast.error('Unable to connect to backend. Please try again.');
+        const apiMessage =
+          typeof error?.response?.data === 'string'
+            ? error.response.data
+            : error?.response?.data?.message;
+        setErrorMessage(apiMessage || 'Unable to connect to backend. Please try again.');
+        toast.error(apiMessage || 'Unable to connect to backend. Please try again.');
       }
     }
   };

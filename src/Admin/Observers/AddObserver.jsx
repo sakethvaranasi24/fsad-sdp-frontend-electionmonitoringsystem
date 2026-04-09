@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../AdminProfessional.css';
 
@@ -39,20 +40,7 @@ function AddObserver({ onObserverAdded }) {
         return;
       }
 
-      const response = await fetch(`${API_URL}/adminapi/observer/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        setMessage(`❌ ${errorText || 'Error adding observer'}`);
-        toast.error(errorText || 'Error adding observer');
-        return;
-      }
+      await axios.post(`${API_URL}/adminapi/observer/add`, formData);
 
       setMessage('✅ Observer added successfully!');
       toast.success('Observer added successfully.');
@@ -70,8 +58,12 @@ function AddObserver({ onObserverAdded }) {
 
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      setMessage('❌ Error adding observer');
-      toast.error('Error adding observer');
+      const apiMessage =
+        typeof error?.response?.data === 'string'
+          ? error.response.data
+          : error?.response?.data?.message;
+      setMessage(`❌ ${apiMessage || 'Error adding observer'}`);
+      toast.error(apiMessage || 'Error adding observer');
     } finally {
       setLoading(false);
     }
