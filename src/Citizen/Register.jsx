@@ -24,7 +24,6 @@ function Register({ citizenProfile }) {
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
-  const [voterId, setVoterId] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -71,7 +70,6 @@ function Register({ citizenProfile }) {
 
     if (Object.keys(newErrors).length === 0) {
       const newVoterId = `VID-${Date.now()}`;
-      setVoterId(newVoterId);
       setMessage(`Registration successful! Your Voter ID: ${newVoterId}`);
       setIsSubmitted(true);
 

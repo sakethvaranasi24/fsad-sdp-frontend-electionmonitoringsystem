@@ -1661,16 +1661,10 @@ function DistrictObserverDashboard({ onLogout }) {
     return () => clearInterval(interval);
   }, [selectedDistrict]);
 
-  useEffect(() => {
-    setSelectedStationId(null);
-  }, [selectedDistrictId]);
-
   const handleSelectSuggestion = (suggestion) => {
     setSearchTerm(suggestion.label);
     setSelectedDistrictId(suggestion.districtId);
-    if (suggestion.type === 'station') {
-      setSelectedStationId(suggestion.stationId);
-    }
+    setSelectedStationId(suggestion.type === 'station' ? suggestion.stationId : null);
   };
 
   const handleSearchSubmit = () => {
@@ -1681,6 +1675,7 @@ function DistrictObserverDashboard({ onLogout }) {
 
   const handleDistrictChange = (districtId) => {
     setSelectedDistrictId(districtId);
+    setSelectedStationId(null);
     const selected = districtsByState.find(district => district.id === districtId);
     setSearchTerm(selected ? selected.name : '');
   };
@@ -1690,6 +1685,7 @@ function DistrictObserverDashboard({ onLogout }) {
     const firstDistrict = districts.find(district => district.state === state);
     if (firstDistrict) {
       setSelectedDistrictId(firstDistrict.id);
+      setSelectedStationId(null);
       setSearchTerm(firstDistrict.name);
     }
   };

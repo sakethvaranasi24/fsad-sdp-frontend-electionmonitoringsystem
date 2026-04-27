@@ -88,7 +88,14 @@ function Dashboard({ onLogout }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const [citizenProfile, setCitizenProfile] = useState(() => getCitizenProfile());
-  const [locationForm, setLocationForm] = useState({ state: '', district: '', email: '' });
+  const [locationForm, setLocationForm] = useState(() => {
+    const profile = getCitizenProfile();
+    return {
+      email: profile.email || '',
+      state: profile.state || '',
+      district: profile.district || ''
+    };
+  });
 
   const citizenInitials = citizenProfile.name
     .split(' ')
@@ -130,14 +137,6 @@ function Dashboard({ onLogout }) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-  useEffect(() => {
-    setLocationForm({
-      email: citizenProfile.email || '',
-      state: citizenProfile.state || '',
-      district: citizenProfile.district || ''
-    });
-  }, [citizenProfile]);
 
   const renderContent = () => {
     switch(activeTab) {

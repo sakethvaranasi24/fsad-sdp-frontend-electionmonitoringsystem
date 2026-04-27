@@ -36,9 +36,9 @@ function CitizenPortal({ onLogout }) {
   const [violationType, setViolationType] = useState('');
   const [violationLocation, setViolationLocation] = useState('');
   const [violationDescription, setViolationDescription] = useState('');
-  const [violationImage, setViolationImage] = useState(null);
+  const [_violationImage, setViolationImage] = useState(null);
   const [violationImagePreview, setViolationImagePreview] = useState(null);
-  const [submittedComplaints, setSubmittedComplaints] = useState([]);
+  const [_submittedComplaints, setSubmittedComplaints] = useState([]);
 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [activeProfileTab, setActiveProfileTab] = useState('details');
@@ -815,7 +815,7 @@ function CitizenPortal({ onLogout }) {
 
 
 
-  const handleSubmitReport = (e) => {
+  const _handleSubmitReport = (e) => {
     e.preventDefault();
     
     const newReport = {
@@ -838,7 +838,7 @@ function CitizenPortal({ onLogout }) {
     setDescription('');
   };
 
-  const handleSwitchRole = () => {
+  const _handleSwitchRole = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       onLogout();
       navigate('/');
@@ -926,9 +926,9 @@ function CitizenPortal({ onLogout }) {
     setViolationImagePreview(null);
   };
 
-  const handleDeleteComplaint = (id) => {
+  const _handleDeleteComplaint = (id) => {
     if (window.confirm('Are you sure you want to delete this complaint?')) {
-      setSubmittedComplaints(submittedComplaints.filter(complaint => complaint.id !== id));
+      setSubmittedComplaints(_submittedComplaints.filter(complaint => complaint.id !== id));
     }
   };
 

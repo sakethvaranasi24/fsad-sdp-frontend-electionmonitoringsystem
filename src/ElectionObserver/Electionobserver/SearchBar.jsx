@@ -26,9 +26,7 @@ function SearchBar({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  useEffect(() => {
-    setIsOpen(Boolean(value && suggestions.length));
-  }, [value, suggestions.length]);
+  const showSuggestions = isOpen && Boolean(value && suggestions.length);
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -55,7 +53,11 @@ function SearchBar({
           type="text"
           placeholder="Search by district name or polling station name"
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => {
+            onChange(event.target.value);
+            setIsOpen(Boolean(event.target.value));
+          }}
+          onFocus={() => setIsOpen(Boolean(value && suggestions.length))}
           onKeyDown={handleKeyDown}
         />
         <select
@@ -84,7 +86,7 @@ function SearchBar({
         </select>
         <button type="button" onClick={onSubmit}>Search</button>
       </div>
-      {isOpen && (
+      {showSuggestions && (
         <ul className="search-suggestions">
           {suggestions.map(suggestion => (
             <li key={`${suggestion.type}-${suggestion.id}`}>

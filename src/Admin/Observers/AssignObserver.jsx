@@ -26,11 +26,7 @@ function AssignObserver() {
   const [selectedStation, setSelectedStation] = useState('');
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  async function loadData() {
     try {
       const [observersResponse, stationsResponse] = await Promise.all([
         axios.get(`${API_URL}/adminapi/observer/all`),
@@ -46,7 +42,15 @@ function AssignObserver() {
       setObservers([]);
       setStations([]);
     }
-  };
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadData();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAssignDistrict = async (e) => {
     e.preventDefault();

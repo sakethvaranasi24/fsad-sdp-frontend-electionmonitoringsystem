@@ -1,4 +1,4 @@
-function ChartsSection({ stats, stations, districtName }) {
+function ChartsSection({ stats, stations }) {
   const totalNotVoted = stats.totalRegistered - stats.totalVotesCast;
   
   return (

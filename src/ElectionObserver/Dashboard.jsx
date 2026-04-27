@@ -105,8 +105,8 @@ function Dashboard({ onLogout }) {
     severity: 'Medium',
     description: ''
   });
-  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
-  const [reportStatus, setReportStatus] = useState('');
+  const [_isSubmittingReport, _setIsSubmittingReport] = useState(false);
+  const [_reportStatus, _setReportStatus] = useState('');
 
   const observerInitials = observerProfile.name
     .split(' ')
@@ -219,20 +219,20 @@ function Dashboard({ onLogout }) {
     }
   }, [assignedStations, observerProfile.assignedStation, reportForm.pollingStation]);
 
-  const handleReportFieldChange = (field, value) => {
-    setReportStatus('');
+  const _handleReportFieldChange = (field, value) => {
+    _setReportStatus('');
     setReportForm((prev) => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleSubmitReport = async (e) => {
+  const _handleSubmitReport = async (e) => {
     e.preventDefault();
 
     const description = reportForm.description.trim();
     if (!reportForm.pollingStation || !description) {
-      setReportStatus('Please select a polling station and enter a detailed description.');
+      _setReportStatus('Please select a polling station and enter a detailed description.');
       return;
     }
 
@@ -247,18 +247,18 @@ function Dashboard({ onLogout }) {
       reportedAt: new Date().toISOString()
     };
 
-    setIsSubmittingReport(true);
-    setReportStatus('');
+    _setIsSubmittingReport(true);
+    _setReportStatus('');
 
     try {
       try {
         await axios.post(`${API_URL}/observerapi/report/submit`, payload);
-        setReportStatus('Submitted report successfully.');
+        _setReportStatus('Submitted report successfully.');
       } catch {
         const savedReports = JSON.parse(localStorage.getItem(OBSERVER_REPORTS_KEY) || '[]');
         savedReports.unshift({ ...payload, status: 'queued-locally' });
         localStorage.setItem(OBSERVER_REPORTS_KEY, JSON.stringify(savedReports));
-        setReportStatus('Submitted report successfully. Saved locally and will sync when backend is available.');
+        _setReportStatus('Submitted report successfully. Saved locally and will sync when backend is available.');
       }
 
       setReportForm((prev) => ({
@@ -271,9 +271,9 @@ function Dashboard({ onLogout }) {
       const savedReports = JSON.parse(localStorage.getItem(OBSERVER_REPORTS_KEY) || '[]');
       savedReports.unshift({ ...payload, status: 'queued-locally' });
       localStorage.setItem(OBSERVER_REPORTS_KEY, JSON.stringify(savedReports));
-      setReportStatus('Submitted report successfully.');
+      _setReportStatus('Submitted report successfully.');
     } finally {
-      setIsSubmittingReport(false);
+      _setIsSubmittingReport(false);
     }
   };
 

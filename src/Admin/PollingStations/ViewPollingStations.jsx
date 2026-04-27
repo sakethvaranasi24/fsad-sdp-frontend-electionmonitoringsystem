@@ -23,18 +23,22 @@ function ViewPollingStations() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDistrict, setFilterDistrict] = useState('');
 
-  useEffect(() => {
-    loadStations();
-  }, []);
-
-  const loadStations = async () => {
+  async function loadStations() {
     try {
       const response = await axios.get(`${API_URL}/adminapi/polling-station/all`);
       setStations(extractList(response.data));
     } catch {
       setStations([]);
     }
-  };
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadStations();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredStations = stations.filter(station => {
     const stationName = station.stationName || station.name || '';

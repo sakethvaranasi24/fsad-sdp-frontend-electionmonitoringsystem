@@ -23,18 +23,22 @@ function ViewAllObservers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
 
-  useEffect(() => {
-    loadObservers();
-  }, []);
-
-  const loadObservers = async () => {
+  async function loadObservers() {
     try {
       const response = await axios.get(`${API_URL}/adminapi/observer/all`);
       setObservers(extractList(response.data));
     } catch {
       setObservers([]);
     }
-  };
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadObservers();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredObservers = observers.filter(obs => {
     const observerName = obs.observerName || obs.name || '';

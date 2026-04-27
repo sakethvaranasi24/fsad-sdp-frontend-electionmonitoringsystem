@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AuthLayout from './AuthLayout';
+import { setToken } from '../utils/auth';
 
 const REGISTERED_USERS_KEY = 'emsRegisteredUsers';
 const CURRENT_USER_KEY = 'user';
@@ -265,6 +266,30 @@ function RoleLoginTemplate({
           aadhaarNumber: baseResponse?.aadhaarNumber || payload?.aadhaarNumber || '',
           password: payload?.password || ''
         };
+
+        // Persist token if backend returned one (supports common token field names)
+        const possibleToken = (
+          loginData?.token
+          || loginData?.accessToken
+          || loginData?.access_token
+          || loginData?.jwt
+          || loginData?.authToken
+          || responseObject?.token
+          || responseObject?.accessToken
+          || responseObject?.access_token
+          || responseObject?.jwt
+          || responseObject?.authToken
+          || baseResponse?.token
+          || baseResponse?.accessToken
+        );
+
+        if (possibleToken) {
+          try {
+            setToken(possibleToken, { remember: rememberMe });
+          } catch (e) {
+            console.error('Failed to save auth token', e);
+          }
+        }
 
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(mergedUserProfile));
 
