@@ -89,6 +89,8 @@ function RoleLoginTemplate({
   const [registrationEmail, setRegistrationEmail] = useState('');
   const [registrationPassword, setRegistrationPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   const [loginError, setLoginError] = useState('');
   const [registrationError, setRegistrationError] = useState('');
@@ -103,6 +105,8 @@ function RoleLoginTemplate({
     setRegistrationPassword('');
     setConfirmPassword('');
     setRegistrationError('');
+    setOtp('');
+    setIsOtpSent(false);
   };
 
   const handleRegistrationSubmit = async (e) => {
@@ -148,6 +152,29 @@ function RoleLoginTemplate({
         email: normalizedEmail,
         password: registrationPassword
       };
+
+      const baseUrl = registerPath.split('/').slice(0, 3).join('/');
+      
+      if (!isOtpSent) {
+        try {
+          await axios.post(`${baseUrl}/api/otp/send?email=${normalizedEmail}`);
+          setIsOtpSent(true);
+          toast.success('OTP sent to your email.');
+          return;
+        } catch (error) {
+          console.error('OTP send error:', error);
+          setRegistrationError('Failed to send OTP. Please try again.');
+          return;
+        }
+      } else {
+        try {
+          await axios.post(`${baseUrl}/api/otp/verify?email=${normalizedEmail}&otp=${otp}`);
+        } catch (error) {
+          console.error('OTP verify error:', error);
+          setRegistrationError('Invalid OTP. Please try again.');
+          return;
+        }
+      }
     }
 
     try {
@@ -515,17 +542,33 @@ function RoleLoginTemplate({
                 </div>
               </>
             ) : (
-              <div className="auth-form-group">
-                <label htmlFor="registration-email">Email Address *</label>
-                <input
-                  type="email"
-                  id="registration-email"
-                  placeholder="Enter your email"
-                  value={registrationEmail}
-                  onChange={(e) => setRegistrationEmail(e.target.value)}
-                  required
-                />
-              </div>
+              <>
+                <div className="auth-form-group">
+                  <label htmlFor="registration-email">Email Address *</label>
+                  <input
+                    type="email"
+                    id="registration-email"
+                    placeholder="Enter your email"
+                    value={registrationEmail}
+                    onChange={(e) => setRegistrationEmail(e.target.value)}
+                    required
+                    disabled={isOtpSent}
+                  />
+                </div>
+                {isOtpSent && (
+                  <div className="auth-form-group">
+                    <label htmlFor="registration-otp">Enter OTP *</label>
+                    <input
+                      type="text"
+                      id="registration-otp"
+                      placeholder="6-digit OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
+              </>
             )}
 
             <div className="auth-form-group">
@@ -537,6 +580,7 @@ function RoleLoginTemplate({
                 value={registrationPassword}
                 onChange={(e) => setRegistrationPassword(e.target.value)}
                 required
+                disabled={isOtpSent}
               />
             </div>
 
@@ -549,13 +593,14 @@ function RoleLoginTemplate({
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                disabled={isOtpSent}
               />
             </div>
 
             {registrationError && <p className="auth-status auth-status-error">{registrationError}</p>}
 
             <button type="submit" className="auth-button">
-              Register
+              {citizenMode ? 'Register' : (isOtpSent ? 'Verify & Register' : 'Send OTP')}
             </button>
 
             <div className="auth-links">
